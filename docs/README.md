@@ -17,6 +17,8 @@
 > 新的笔记将自动添加到下方
 
 <!-- NEW_NOTES_START -->
+- **[005. Expo Router 路由与基础组件](notes/005-expo-router-basics.md)**
+  - 涵盖文件路由、Stack/Tabs 布局嵌套、View/Text 组件及 StyleSheet 样式管理
 <!-- 这是一个锚点，AI 会自动识别这里并追加新链接 -->
 
 <!-- NEW_NOTES_END -->
