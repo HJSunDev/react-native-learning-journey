@@ -9,6 +9,15 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
+        name="login"
+        options={{
+          title: "登录",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: "首页",
@@ -18,15 +27,6 @@ export default function TabsLayout() {
             ) : (
               <Ionicons name="home-outline" size={size} color={color} />
             )
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="login"
-        options={{
-          title: "登录",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

@@ -17,6 +17,8 @@
 > 新的笔记将自动添加到下方
 
 <!-- NEW_NOTES_START -->
+- **[006. 客户端架构设计与 API 对接准备](notes/006-client-arch-and-api-setup.md)**
+  - 总结前端网络层架构 (Axios + React Query) 及目录规范，包含 iOS 键盘交互处理
 - **[005. Expo Router 路由与基础组件](notes/005-expo-router-basics.md)**
   - 涵盖文件路由、Stack/Tabs 布局嵌套、View/Text 组件及 StyleSheet 样式管理
 <!-- 这是一个锚点，AI 会自动识别这里并追加新链接 -->
