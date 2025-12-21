@@ -5,23 +5,27 @@
 在 React Native 应用中，构建一个健壮的“客户端-服务端”交互层至关重要。这不仅仅是发请求，还涉及到状态管理、类型安全和模块化设计。
 
 **主要目标：**
-1.  **解耦**: 界面 (UI) 不应直接包含复杂的请求逻辑。
-2.  **类型安全**: 利用 TypeScript 确保发送和接收的数据符合预期。
-3.  **用户体验**: 处理好加载中 (Loading)、错误 (Error) 和成功 (Success) 状态。
+
+1. **解耦**: 界面 (UI) 不应直接包含复杂的请求逻辑。
+2. **类型安全**: 利用 TypeScript 确保发送和接收的数据符合预期。
+3. **用户体验**: 处理好加载中 (Loading)、错误 (Error) 和成功 (Success) 状态。
 
 ## 2. 核心技术栈 (Tech Stack)
 
 ### 2.1 TanStack Query (React Query)
+
 > "Powerful asynchronous state management"
 
 - **作用**: 管理服务端状态（Server State）。
 - **为什么用它**: 自动处理缓存、去重、后台更新、重试逻辑以及 `isLoading`/`isError` 状态。避免了手动写大量的 `useEffect` 和 `useState`。
 
 ### 2.2 Axios
+
 - **作用**: HTTP 客户端。
 - **为什么用它**: 比原生 `fetch` 更强大，支持请求/响应拦截器（处理 Token、全局错误），自动转换 JSON 数据。
 
 ### 2.3 Async Storage (@react-native-async-storage/async-storage)
+
 - **作用**: 移动端的本地持久化存储（类似于 Web 的 localStorage）。
 - **为什么用它**:
   - 用于存储用户的登录态 (Token)、用户信息或应用配置。
@@ -43,13 +47,14 @@ src/
 │       ├── types.ts      # 请求/响应的 TypeScript 接口
 │       ├── useAuth.ts    # 封装 React Query Hooks (useMutation/useQuery)
 │       └── index.ts      # 对外暴露接口
-└── utils/                
+└── utils/            
     └── storage.ts        # 本地存储 (Token 持久化)
 ```
 
 ## 4. 核心用法 (Usage)
 
 ### 4.1 全局 QueryClient 配置 (`app/_layout.tsx`)
+
 React Query 需要在应用根组件包裹 `QueryClientProvider`。
 
 ```typescript
@@ -64,6 +69,7 @@ return (
 ```
 
 ### 4.2 定义 API (`features/auth/api.ts`)
+
 纯函数，只负责发请求，不涉及 UI 状态。
 
 ```typescript
@@ -76,6 +82,7 @@ export const authApi = {
 ```
 
 ### 4.3 封装 Hook (`features/auth/useAuth.ts`)
+
 将 API 请求转换为 React Hooks，注入业务逻辑（如登录成功后的跳转）。
 
 ```typescript
@@ -134,3 +141,36 @@ export default function LoginScreen() {
 - ✅ **集中管理 Token**: 在 `src/utils/storage.ts` 中封装 AsyncStorage，不要散落在各处。
 - ✅ **类型优先**: 先定义 `interface`，再写 API 函数。
 - ❌ **避免在组件中处理复杂逻辑**: 尽量下沉到 Custom Hooks 中。
+
+## 7. 快速复刻 (Quick Start)
+
+### 1. 安装核心依赖
+
+```bash
+# 1. 状态管理、网络请求、本地存储、Schema验证
+npm install @tanstack/react-query axios @react-native-async-storage/async-storage zod
+
+# 2. 跨平台环境变量支持 (用于区分 dev/prod)
+npm install --save-dev cross-env
+```
+
+### 2. 初始化目录结构
+
+在项目根目录下执行（Linux/Mac/Git Bash）：
+
+```bash
+mkdir -p src/api src/features/auth src/utils
+```
+
+### 3. 配置启动脚本
+
+修改 `package.json` 的 `scripts` 部分，添加开发和生产环境启动命令：
+
+```json
+"scripts": {
+  "start": "expo start",
+  "start:dev": "cross-env NODE_ENV=development expo start",   // 新增
+  "start:prod": "cross-env NODE_ENV=production expo start",    // 新增
+  // ... 其他脚本
+}
+```
