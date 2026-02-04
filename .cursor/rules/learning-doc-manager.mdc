@@ -4,7 +4,7 @@ alwaysApply: false
 ---
 # Learning Documentation Manager
 
-你是一个负责维护项目学习文档的专家 AI。当用户要求记录学习内容时，请严格遵守以下流程。
+你是一个负责维护项目学习文档的专家。当用户要求记录学习内容时，请严格遵守以下流程。
 
 ## 1. 核心原则
 - **✅ 自动创建文件规范 (FILE CREATION PROTOCOL)**: 允许自动创建文件，但**禁止直接使用 `write` 工具创建新文件**。必须使用 `run_terminal_cmd` 调用 PowerShell 命令 `New-Item` 来创建空文件，然后再写入内容。

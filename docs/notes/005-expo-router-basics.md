@@ -9,7 +9,158 @@
 * **页面**: `app/` 目录下的 `.tsx` 文件自动成为一个页面。例如 `app/login.tsx` 对应路由 `/login`。
 * **布局 (`_layout.tsx`)**: 这是一个特殊文件，用于在多个页面之间共享 UI（如导航栏、底部 Tab）。它充当“包装器”，将被包裹的页面内容渲染在 `<Slot />` 或导航器（如 `<Stack>`, `<Tabs>`）中。
 
-### 1.2 路由分组 (Group Syntax)
+### 1.2 Stack 导航器
+
+在 Expo Router 中，**`<Stack>` 是一种导航器（Navigator）**，用于实现"栈式导航"（Stack Navigation）。它是构建页面层级关系的核心组件。
+
+#### 1.2.1 核心概念
+
+**栈式导航的工作原理：**
+
+* **导航栈（Navigation Stack）**：类似于 iOS/Android 原生应用的页面堆栈，是一个后进先出（LIFO）的数据结构
+* **压栈（Push）**：跳转到新页面时，新页面被压入栈顶，成为当前可见页面
+* **出栈（Pop）**：返回时，当前页面从栈顶弹出，露出下层页面
+* **栈深度**：栈中页面数量决定了返回层级，可以连续返回到任意层级
+
+**表现形态：**
+
+`<Stack>` 默认会为每个页面添加**顶部导航栏（Header）**，包含：
+
+- 左侧返回按钮（根页面除外）
+- 中间页面标题
+- 右侧可操作区域（可选）
+
+#### 1.2.2 Stack vs Tabs 对比
+
+| 维度               | Stack                | Tabs                |
+| ------------------ | -------------------- | ------------------- |
+| **导航模式** | 层级递进（父→子）   | 同级切换            |
+| **用户认知** | 进入新页面，可返回   | 切换不同模块        |
+| **视觉表现** | 页面推入/推出动画    | 底部标签高亮切换    |
+| **典型场景** | 列表→详情、表单流程 | 首页/发现/我的      |
+| **栈管理**   | 维护独立导航栈       | 每个 Tab 可有独立栈 |
+
+#### 1.2.3 Stack.Screen 配置详解
+
+`<Stack.Screen>` 用于声明和配置单个页面，必须作为 `<Stack>` 的子元素。
+
+**基础属性：**
+
+```tsx
+<Stack.Screen
+  name="profile"           // 路由名称（对应文件路径）
+  options={{
+    title: "个人中心",      // 页面标题（显示在导航栏中央）
+    headerShown: true,      // 是否显示导航栏（默认 true）
+  }}
+/>
+```
+
+**完整的 Options 配置：**
+
+```tsx
+<Stack.Screen
+  name="detail"
+  options={{
+    // === 标题配置 ===
+    title: "商品详情",
+    headerTitle: "自定义标题组件",  // 可传入 React 元素
+    headerTitleAlign: "center",      // 标题对齐：left / center
+    headerTitleStyle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: "#333",
+    },
+
+    // === 导航栏显示控制 ===
+    headerShown: true,               // 是否显示导航栏
+    headerTransparent: false,        // 导航栏是否透明
+    headerBlurEffect: "light",       // iOS 模糊效果（需透明）
+
+    // === 返回按钮配置 ===
+    headerBackTitle: "返回",         // 返回按钮文字（iOS 默认显示）
+    headerBackTitleVisible: false,   // 是否显示返回文字
+    headerBackButtonMenuEnabled: true, // iOS 长按返回按钮显示历史
+
+    // === 左右按钮自定义 ===
+    headerLeft: () => <CustomBackButton />,
+    headerRight: () => <ShareButton />,
+
+    // === 导航栏样式 ===
+    headerStyle: {
+      backgroundColor: "#fff",
+      elevation: 0,                  // Android 阴影
+      shadowOpacity: 0,              // iOS 阴影
+    },
+    headerTintColor: "#007AFF",      // 返回按钮和标题颜色
+
+    // === 动画与交互 ===
+    animation: "slide_from_right",   // 动画类型
+    gestureEnabled: true,            // 是否启用手势返回（iOS 默认 true）
+    gestureDirection: "horizontal",  // 手势方向
+    fullScreenGestureEnabled: true,  // 全屏手势返回（iOS）
+
+    // === 特殊呈现模式 ===
+    presentation: "card",            // card / modal / transparentModal / fullScreenModal
+    contentStyle: {                  // 页面内容容器样式
+      backgroundColor: "#f5f5f5",
+    },
+  }}
+/>
+```
+
+**presentation 模式说明：**
+
+| 模式                 | 效果                   | 适用场景       |
+| -------------------- | ---------------------- | -------------- |
+| `card`             | 默认卡片式推入         | 普通页面跳转   |
+| `modal`            | 从底部弹出，带遮罩     | 表单、选择器   |
+| `transparentModal` | 透明背景模态           | 弹窗、底部抽屉 |
+| `fullScreenModal`  | 全屏模态（无返回按钮） | 全屏预览、相机 |
+| `containedModal`   | 在容器内弹出           | 嵌套导航场景   |
+
+#### 1.2.4 Stack 全局配置（screenOptions）
+
+通过 `screenOptions` 可统一配置所有子页面的默认行为：
+
+```tsx
+export default function Layout() {
+  return (
+    <Stack
+      screenOptions={{
+        // 全局标题样式
+        headerTitleStyle: { fontWeight: "600" },
+        headerTintColor: "#333",
+      
+        // 全局导航栏样式
+        headerStyle: { backgroundColor: "#fff" },
+      
+        // 全局动画
+        animation: "slide_from_right",
+      
+        // 全局手势
+        gestureEnabled: true,
+        fullScreenGestureEnabled: true,
+      
+        // 自定义返回按钮（全局）
+        headerLeft: () => <CustomBackIcon />,
+      }}
+    >
+      <Stack.Screen name="index" options={{ title: "首页" }} />
+      <Stack.Screen 
+        name="detail" 
+        options={{ 
+          title: "详情",
+          // 单独覆盖全局配置
+          headerShown: false,
+        }} 
+      />
+    </Stack>
+  );
+}
+```
+
+### 1.3 路由分组 (Group Syntax)
 
 使用圆括号 `()` 包裹的目录名称（例如 `app/(tabs)/`）称为**分组**。
 
@@ -104,7 +255,7 @@ export default function Index() {
   );
 }
 
-// 最佳实践：使用 StyleSheet.create 定义样式
+// 使用 StyleSheet.create 定义样式
 const styles = StyleSheet.create({
   container: {
     flex: 1, // 占满可用空间
@@ -118,7 +269,167 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 2.3 使用图标库
+### 2.3 Stack 实战：导航操作与动态配置
+
+#### 编程式导航（useRouter）
+
+在页面组件中使用 `useRouter` 进行命令式导航操作：
+
+```tsx
+import { useRouter } from "expo-router";
+
+export default function ProductList() {
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    // 基础跳转（压栈）
+    router.push("/detail/123");
+  
+    // 携带参数跳转
+    router.push({
+      pathname: "/detail/[id]",
+      params: { id: "123", from: "list" }
+    });
+  
+    // 替换当前页面（不压栈，替换栈顶）
+    router.replace("/home");
+  
+    // 返回上一页
+    router.back();
+  
+    // 返回到指定层级
+    router.navigate("/home");  // 如果栈中存在则返回，否则跳转
+  
+    // 重置导航栈（回到首页并清空历史）
+    // 需要配合 NavigationContainer 使用
+  };
+
+  return <Button title="查看详情" onPress={handleNavigate} />;
+}
+```
+
+#### 声明式导航（Link 组件）
+
+`Link` 组件提供了类似 Web `<a>` 标签的声明式导航方式，适用于按钮、列表项等可点击元素。
+
+**基础用法：**
+
+```tsx
+import { Link } from "expo-router";
+
+// 基本跳转（默认 push，等同于 router.push）
+<Link href="/detail/123">查看详情</Link>
+
+// 携带参数
+<Link 
+  href={{
+    pathname: "/detail/[id]",
+    params: { id: "123", from: "list" }
+  }}
+>
+  查看详情
+</Link>
+```
+
+**Link vs push 的关系：**
+
+| 特性 | `Link` 组件 | `router.push` |
+|------|-------------|---------------|
+| **导航方式** | 声明式（JSX） | 命令式（函数调用） |
+| **默认行为** | push（压栈） | push（压栈） |
+| **使用场景** | 可点击的 UI 元素 | 条件判断、异步操作后跳转 |
+| **样式传递** | 支持 `asChild` | 不适用 |
+
+**Link 的常用属性：**
+
+```tsx
+<Link
+  href="/profile"              // 目标路由（string 或对象）
+  replace                       // 等同于 router.replace，替换而非压栈
+  push                          // 显式指定 push（默认，可省略）
+  asChild                       // 将样式和行为传递给子元素
+  onPress={(e) => {            // 点击事件拦截
+    if (!isLogin) {
+      e.preventDefault();       // 阻止默认跳转
+      router.push("/login");
+    }
+  }}
+>
+  <TouchableOpacity style={styles.button}>
+    <Text>个人中心</Text>
+  </TouchableOpacity>
+</Link>
+```
+
+**asChild 模式（样式传递）：**
+
+当需要给 Link 添加复杂样式或包裹自定义组件时，使用 `asChild`：
+
+```tsx
+// ✅ 使用 asChild，Link 的样式由子元素控制
+<Link href="/detail" asChild>
+  <TouchableOpacity style={styles.card} activeOpacity={0.8}>
+    <Image source={product.image} />
+    <Text>{product.name}</Text>
+  </TouchableOpacity>
+</Link>
+
+// ❌ 不使用 asChild，Link 会包裹一层默认样式
+<Link href="/detail" style={styles.card}>
+  <Text>{product.name}</Text>
+</Link>
+```
+
+**如何选择：**
+
+- **使用 `Link`**：列表项、卡片、按钮等可点击元素，需要用户主动点击触发
+- **使用 `router.push`**：表单提交后跳转、条件判断后跳转、定时器跳转等命令式场景
+
+#### 动态头部配置
+
+使用 `useNavigation` 在运行时动态修改导航栏：
+
+```tsx
+import { useNavigation } from "expo-router";
+import { useEffect } from "react";
+
+export default function DynamicHeaderPage() {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: "动态标题",
+      headerRight: () => (
+        <TouchableOpacity onPress={handleSave}>
+          <Text style={{ color: "#007AFF", marginRight: 16 }}>保存</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  return <View />;
+}
+```
+
+#### 接收导航参数
+
+```tsx
+import { useLocalSearchParams } from "expo-router";
+
+export default function DetailPage() {
+  // 获取 URL 参数
+  const { id, from } = useLocalSearchParams();
+  
+  return (
+    <View>
+      <Text>商品 ID: {id}</Text>
+      <Text>来源: {from}</Text>
+    </View>
+  );
+}
+```
+
+### 2.4 使用图标库
 
 Expo 预装了 `@expo/vector-icons`，包含主流图标集（Ionicons, FontAwesome, MaterialIcons 等）。
 
@@ -141,18 +452,155 @@ import { Ionicons } from "@expo/vector-icons";
   * **维护**: 将样式与业务逻辑分离，代码更清晰。
 * **❌ 避免**: 大量使用内联样式 `style={{ width: 100, ... }}`，除非是动态计算的值。
 
-### 3.2 布局层级管理
+### 3.2 Stack 导航架构设计
 
-* **✅ 推荐**: 保持 `_layout.tsx` 纯净。只负责导航结构的定义，不要在其中编写复杂的业务逻辑或从服务器获取数据。
-* **✅ 推荐**: 合理使用 `Stack` 和 `Tabs` 的组合。通常 App 的根是 `Stack`（用于处理模态框、全屏页面），内部包含一个 `Tabs`（作为主界面）。
+* **根 Stack + 内部 Tabs 模式（推荐）**
 
-### 3.3 图标管理
+```
+app/
+├── _layout.tsx          # Root Stack：处理全局导航、模态框
+├── (tabs)/
+│   ├── _layout.tsx      # Tabs 布局：底部导航
+│   ├── index.tsx        # 首页
+│   └── profile.tsx      # 个人中心
+├── product/
+│   ├── [id].tsx         # 商品详情（Stack 页面）
+│   └── _layout.tsx      # Product Stack（可选）
+└── settings/
+    └── index.tsx        # 设置页（全屏 Modal）
+```
 
-* **✅ 推荐**: 统一使用一种图标风格（如全是 Outline 或全是 Filled）。
-* **✅ 推荐**: 可以在 `constants/Colors.ts` 中统一定义 `tabBarActiveTintColor` 等颜色变量，而不是硬编码颜色值。
+```tsx
+// app/_layout.tsx
+export default function RootLayout() {
+  return (
+    <Stack>
+      {/* 主界面：Tabs，隐藏 Stack 头部 */}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    
+      {/* 普通页面：继承 Stack 头部 */}
+      <Stack.Screen name="product/[id]" options={{ title: "商品详情" }} />
+    
+      {/* 模态框：从底部弹出 */}
+      <Stack.Screen 
+        name="settings/index" 
+        options={{ presentation: "modal", title: "设置" }} 
+      />
+    
+      {/* 全屏页面：用于图片预览等 */}
+      <Stack.Screen 
+        name="image-viewer" 
+        options={{ presentation: "fullScreenModal", headerShown: false }} 
+      />
+    </Stack>
+  );
+}
+```
+
+* **Stack 嵌套 Stack（复杂场景）**
+
+当某个 Tab 内部需要复杂的多级页面时，可以为该 Tab 单独配置 Stack：
+
+```tsx
+// app/(tabs)/product/_layout.tsx
+export default function ProductStack() {
+  return (
+    <Stack>
+      <Stack.Screen name="index" options={{ title: "商品列表" }} />
+      <Stack.Screen name="detail/[id]" options={{ title: "商品详情" }} />
+      <Stack.Screen name="reviews" options={{ title: "用户评价" }} />
+    </Stack>
+  );
+}
+```
+
+* **保持 `_layout.tsx` 纯净**
+
+只负责导航结构定义，不编写业务逻辑：
+
+```tsx
+// ✅ 好的做法：_layout.tsx 只配置导航
+export default function Layout() {
+  return (
+    <Stack screenOptions={{ headerTitleAlign: "center" }}>
+      <Stack.Screen name="index" />
+    </Stack>
+  );
+}
+
+// ✅ 在页面组件中设置动态标题
+// app/index.tsx
+export default function Index() {
+  const { data } = useQuery({...});  // 获取数据
+  
+  useEffect(() => {
+    navigation.setOptions({ title: data?.name });
+  }, [data]);
+  
+  return <View />;
+}
+```
+
+### 3.3 性能优化建议
+
+* **避免深层嵌套 Stack**
+
+超过 3 层嵌套的 Stack 会导致导航状态难以追踪，考虑使用 `navigate` 替代多层 `push`：
+
+```tsx
+// ❌ 不推荐：深层嵌套跳转
+router.push("/a");
+router.push("/a/b");
+router.push("/a/b/c");
+
+// ✅ 推荐：直接跳转到目标，或使用 navigate
+router.navigate("/a/b/c");  // 如果栈中存在则复用
+```
+
+* **懒加载大页面**
+
+对于不常用的页面，使用动态导入减少初始加载：
+
+```tsx
+import { lazy } from "react";
+
+const HeavyComponent = lazy(() => import("./HeavyPage"));
+```
+
+* **合理使用 `replace` 替代 `push`**
+
+在登录成功、提交表单后的跳转场景，使用 `replace` 避免用户返回到中间状态页：
+
+```tsx
+// 登录成功后，替换登录页，用户按返回不会回到登录页
+router.replace("/home");
+```
+
+### 3.4 图标与样式管理
+
+* **统一图标风格**：在一个 Stack 内保持图标风格一致（如全是 Outline 或全是 Filled）
+* **提取公共配置**：将常用的 `headerStyle`、`headerTitleStyle` 提取到 `screenOptions`
+* **颜色变量集中管理**：在 `constants/Colors.ts` 中定义导航栏颜色
+
+```tsx
+// constants/Navigation.ts
+export const StackScreenOptions = {
+  headerTitleStyle: { fontWeight: "600", fontSize: 17 },
+  headerStyle: { backgroundColor: "#fff" },
+  headerTintColor: "#007AFF",
+  headerShadowVisible: false,  // 隐藏底部分割线
+};
+
+// app/_layout.tsx
+import { StackScreenOptions } from "@/constants/Navigation";
+
+<Stack screenOptions={StackScreenOptions}>
+```
 
 ## 4. 关联知识
 
 - [Expo Router 官方文档](https://docs.expo.dev/router/introduction/)
+- [Stack Navigator 详细配置](https://docs.expo.dev/router/advanced/stack/)
+- [React Navigation Stack 文档](https://reactnavigation.org/docs/stack-navigator/)
 - [React Native 核心组件](https://reactnative.dev/docs/components-and-apis)
 - [Ionicons 图标目录](https://icons.expo.fyi/Index)

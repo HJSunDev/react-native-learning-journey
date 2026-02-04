@@ -1,4 +1,4 @@
-## 🚀 Chapter 1: Windows 环境开发注意事项
+## 🚀 Chapter 1: Windows 环境-开发注意事项
 
 ### 1. 项目路径配置规范 (Project Path Configuration)
 
@@ -106,7 +106,7 @@ npx expo start
 
 ### 3. 常见问题与解决方案
 
-#### ❌ 问题 1：代理配置错误
+#### 问题 1：代理配置错误
 
 ##### 错误信息
 
@@ -316,10 +316,16 @@ npm run reset-project
 Do you want to move existing files to /app-example instead of deleting them? (Y/n):
 ```
 
+
 **选项说明：**
 
 - **输入 `Y` 或直接回车**：将现有文件移动到 `app-example` 目录（保留备份）
 - **输入 `n`**：直接删除现有文件（不保留备份）
+
+
+**建议：输入 `n`（直接删除）**
+
+如果希望从零开始构建项目，直接删除示例代码是更简洁的选择。
 
 #### 删除/移动的目录
 
@@ -348,7 +354,7 @@ Do you want to move existing files to /app-example instead of deleting them? (Y/
 重置完成后，终端会显示下一步操作提示：
 
 ```
-✅ Project reset complete. Next steps:
+Project reset complete. Next steps:
 1. Run `npx expo start` to start a development server.
 2. Edit app/index.tsx to edit the main screen.
 ```
@@ -364,19 +370,18 @@ Do you want to move existing files to /app-example instead of deleting them? (Y/
 
    打开 `app/index.tsx` 开始编写你的应用代码
 
-
 #### 注意事项
 
-⚠️ **重要提醒：**
+**重要提醒：**
 
 1. **重置前请确保重要代码已提交到 Git**
 
    - 重置操作会删除或移动文件，未提交的代码可能丢失
    - 建议在执行重置前先运行 `git status` 检查变更
-2. **选择保留备份（推荐）**
+2. **选择直接删除（推荐 `n`）**
 
-   - 如果选择 `Y`，现有代码会移动到 `app-example` 目录
-   - 可以在需要时参考之前的实现
+   - 从零开始构建项目，目录结构更清晰
+   - 不会产生多余的 `app-example` 备份目录
 3. **重置脚本本身也会被删除**
 
    - 如果选择 `n`（不保留），`scripts/reset-project.js` 也会被删除
