@@ -297,11 +297,10 @@ export default function ProductList() {
     // 返回上一页
     router.back();
   
-    // 返回到指定层级
-    router.navigate("/home");  // 如果栈中存在则返回，否则跳转
+    // 若目标已在栈中则回退到该页（并弹出其上的页面），否则压栈跳转
+    router.navigate("/home");
   
-    // 重置导航栈（回到首页并清空历史）
-    // 需要配合 NavigationContainer 使用
+    // 重置导航栈：可用 router.replace("/(tabs)") 回到主 Tab 并清空栈顶；更细粒度控制需使用 navigation.dispatch(CommonActions.reset(...))
   };
 
   return <Button title="查看详情" onPress={handleNavigate} />;
@@ -345,8 +344,7 @@ import { Link } from "expo-router";
 ```tsx
 <Link
   href="/profile"              // 目标路由（string 或对象）
-  replace                       // 等同于 router.replace，替换而非压栈
-  push                          // 显式指定 push（默认，可省略）
+  replace                       // 为 true 时替换当前页（等同 router.replace），否则默认 push
   asChild                       // 将样式和行为传递给子元素
   onPress={(e) => {            // 点击事件拦截
     if (!isLogin) {
@@ -390,11 +388,16 @@ import { Link } from "expo-router";
 使用 `useNavigation` 在运行时动态修改导航栏：
 
 ```tsx
+import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
 
 export default function DynamicHeaderPage() {
   const navigation = useNavigation();
+
+  const handleSave = () => {
+    // 保存逻辑，如调用 API 后 router.back()
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -417,8 +420,8 @@ export default function DynamicHeaderPage() {
 import { useLocalSearchParams } from "expo-router";
 
 export default function DetailPage() {
-  // 获取 URL 参数
-  const { id, from } = useLocalSearchParams();
+  // 路径参数（如 [id]）为 string；查询参数可能为 string | string[]，使用时需做类型处理
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   
   return (
     <View>
@@ -499,7 +502,7 @@ export default function RootLayout() {
 
 * **Stack 嵌套 Stack（复杂场景）**
 
-当某个 Tab 内部需要复杂的多级页面时，可以为该 Tab 单独配置 Stack：
+当某个 Tab 内部需要复杂的多级页面时，可将该 Tab 做成目录并在其下放 `_layout.tsx` 使用 Stack，对应文件结构为 `app/(tabs)/product/`（product 为 Tab 名）：
 
 ```tsx
 // app/(tabs)/product/_layout.tsx
@@ -530,12 +533,16 @@ export default function Layout() {
 
 // ✅ 在页面组件中设置动态标题
 // app/index.tsx
+import { useEffect } from "react";
+import { useNavigation } from "expo-router";
+
 export default function Index() {
+  const navigation = useNavigation();
   const { data } = useQuery({...});  // 获取数据
   
   useEffect(() => {
     navigation.setOptions({ title: data?.name });
-  }, [data]);
+  }, [navigation, data]);
   
   return <View />;
 }
@@ -559,12 +566,13 @@ router.navigate("/a/b/c");  // 如果栈中存在则复用
 
 * **懒加载大页面**
 
-对于不常用的页面，使用动态导入减少初始加载：
+Expo Router 已按路由做代码分割，进入某路由时才会加载对应页面文件，无需对路由页面再包一层 `lazy`。`React.lazy` 适用于**非路由**的重型组件（如弹窗内容、条件渲染的大模块），或非 Expo Router 管理的屏幕：
 
 ```tsx
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 
-const HeavyComponent = lazy(() => import("./HeavyPage"));
+const HeavyNonRouteComponent = lazy(() => import("./HeavyWidget"));
+// 在需要时用 <Suspense fallback={...}><HeavyNonRouteComponent /></Suspense> 渲染
 ```
 
 * **合理使用 `replace` 替代 `push`**

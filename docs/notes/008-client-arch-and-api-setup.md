@@ -1,4 +1,4 @@
-# 006. 客户端架构设计与 API 对接准备
+# 008. 客户端架构设计与 API 对接准备
 
 ## 1. 核心概念 (Concept)
 
@@ -47,7 +47,7 @@ src/
 │       ├── types.ts      # 请求/响应的 TypeScript 接口
 │       ├── useAuth.ts    # 封装 React Query Hooks (useMutation/useQuery)
 │       └── index.ts      # 对外暴露接口
-└── utils/            
+└── utils/          
     └── storage.ts        # 本地存储 (Token 持久化)
 ```
 
