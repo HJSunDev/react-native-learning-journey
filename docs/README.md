@@ -23,6 +23,8 @@
   - Tabs 核心概念与配置、徽章显示、自定义 TabBar、与 Stack 组合架构
 - **[008. 客户端架构设计与 API 对接准备](notes/007-client-arch-and-api-setup.md)**
   - 总结前端网络层架构 (Axios + React Query) 及目录规范，包含 iOS 键盘交互处理
+- **[009. 全局认证状态管理与安全存储](notes/009-auth-state-and-secure-storage.md)**
+  - Zustand 全局 Auth 状态、expo-secure-store 加密存储、AuthGuard 路由守卫与路由重构
 
 <!-- 这是一个锚点，AI 会自动识别这里并追加新链接 -->
 

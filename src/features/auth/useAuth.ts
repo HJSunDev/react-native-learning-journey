@@ -1,29 +1,41 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
 import { Alert } from 'react-native';
-import { storage } from '../../utils/storage';
+import { useAuthStore } from '../../stores/authStore';
 import { authApi } from './api';
 import { LoginParams } from './types';
 
 export const useLogin = () => {
-  const router = useRouter();
+  const signIn = useAuthStore((s) => s.signIn);
 
   return useMutation({
     mutationFn: (data: LoginParams) => authApi.login(data),
     onSuccess: async (data) => {
-      // 1. 存储 Token 和用户信息
-      await storage.setToken(data.token);
-      await storage.setUserInfo(data);
-      
-      console.log('登录成功', data);
+      const { token, ...user } = data;
 
-      // 2. 跳转页面 (假设首页是 tabs)
-      router.replace('/(tabs)');
+      // 写入 Zustand 内存状态 + 持久化存储（Token → SecureStore, 用户信息 → AsyncStorage）
+      // AuthGuard 监听 token 变化后会自动跳转到主页，无需手动 router.replace
+      await signIn(token, user);
+
+      console.log('登录成功', data);
     },
-    onError: (error: any) => {
-      // 这里的 error 已经被 Axios 拦截器处理过一次，或者可以这里进行二次 UI 处理
+    onError: (error: Error) => {
       Alert.alert('登录失败', error.message || '请稍后重试');
     },
   });
 };
 
+export const useLogout = () => {
+  const signOut = useAuthStore((s) => s.signOut);
+
+  return useMutation({
+    mutationFn: () => authApi.logout(),
+    onSuccess: async () => {
+      // 清除内存状态 + 持久化存储
+      // AuthGuard 监听 token 变为 null 后会自动跳转到登录页
+      await signOut();
+    },
+    onError: (error: Error) => {
+      Alert.alert('登出失败', error.message || '请稍后重试');
+    },
+  });
+};

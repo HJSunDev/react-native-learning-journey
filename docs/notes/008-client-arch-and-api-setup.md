@@ -142,6 +142,8 @@ export default function LoginScreen() {
 - ✅ **类型优先**: 先定义 `interface`，再写 API 函数。
 - ❌ **避免在组件中处理复杂逻辑**: 尽量下沉到 Custom Hooks 中。
 
+> **架构升级**: 本文档为初始方案。全局认证状态管理 (Zustand)、Token 安全存储 (expo-secure-store) 和路由守卫 (AuthGuard) 的完整设计见 → [009. 全局认证状态管理与安全存储](009-auth-state-and-secure-storage.md)
+
 ## 7. 快速复刻 (Quick Start)
 
 ### 1. 安装核心依赖

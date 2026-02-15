@@ -8,18 +8,18 @@
 
 **核心特性：**
 
-* **同级导航**：所有 Tab 处于同一层级，没有严格的父子关系
+* **同级导航**：所有 Tab 处于同一层级
 * **状态保持**：切换 Tab 时，之前 Tab 的状态会被保留（Scroll 位置、输入内容等）
 * **视觉反馈**：当前选中的 Tab 会高亮显示（图标、文字颜色变化）
 * **无滑动切换**：Bottom Tabs 不支持左右滑动切换 Tab；若需滑动切换应使用 Material Top Tabs（需单独集成）
 
 **典型应用场景：**
 
-| 应用类型 | Tab 结构示例                  |
-| -------- | ----------------------------- |
-| 电商应用 | 首页 / 分类 / 购物车 / 我的   |
-| 社交应用 | 消息 / 通讯录 / 发现 / 我     |
-| 内容应用 | 推荐 / 关注 / 搜索 / 个人中心 |
+| 应用类型 | Tab 结构示例                 |
+| -------- | ---------------------------- |
+| 电商应用 | 首页 / 消息 / 购物车 / 我的 |
+| 社交应用 | 微信 / 通讯录 / 发现 / 我    |
+| 内容应用 | 首页 / 关注 / 上传 / 我的   |
 
 ### 1.2 Tabs vs Stack 对比
 
@@ -244,21 +244,21 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#999",       // 未激活状态颜色
         tabBarActiveBackgroundColor: "transparent", // 激活背景（通常不用）
         tabBarInactiveBackgroundColor: "transparent",
-      
+    
         // 标签文字样式
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "500",
         },
-      
+    
         // 图标样式
         tabBarIconStyle: {
           marginTop: 4,
         },
-      
+    
         // 是否显示标签
         tabBarShowLabel: true,
-      
+    
         // 标签位置
         tabBarLabelPosition: "below-icon",
       }}
@@ -395,7 +395,7 @@ export default function RootLayout() {
     <Stack>
       {/* Tabs 作为主界面，隐藏 Stack 头部 */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    
+  
       {/* 全局模态框 */}
       <Stack.Screen 
         name="modal/camera" 
@@ -465,7 +465,7 @@ export default function ExploreIndex() {
     <View>
       {/* 同 Tab 内的页面跳转 */}
       <Link href="/(tabs)/explore/search">去搜索</Link>
-    
+  
       {/* 跨 Tab 跳转 */}
       <Link href="/(tabs)/profile">去个人中心</Link>
     </View>
@@ -491,19 +491,19 @@ export default function TabsLayout() {
     <Tabs>
       <Tabs.Screen name="index" />
       <Tabs.Screen name="explore" />
-    
+  
       {/* 仅登录时在 TabBar 显示；未登录时路由仍存在，仅隐藏入口 */}
       <Tabs.Screen
         name="messages"
         options={{ href: isLogin ? undefined : null }}
       />
-    
+  
       {/* 仅 VIP 在 TabBar 显示 */}
       <Tabs.Screen
         name="vip"
         options={{ href: isVip ? undefined : null }}
       />
-    
+  
       <Tabs.Screen name="profile" />
     </Tabs>
   );

@@ -1,5 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { storage } from '../utils/storage';
+import { secureStorage } from '../utils/storage';
 import { config } from './config';
 
 // 1. 创建实例
@@ -14,7 +14,7 @@ export const client = axios.create({
 // 2. 请求拦截器：自动注入 Token
 client.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = await storage.getToken();
+    const token = await secureStorage.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

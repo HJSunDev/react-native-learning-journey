@@ -1,12 +1,20 @@
 import { useState } from "react";
-import { ActivityIndicator, Button, Keyboard, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  Keyboard,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { useLogin } from "../../src/features/auth";
 
-export default function Login() {
+export default function LoginScreen() {
   const [phone, setPhone] = useState('13800138000');
   const [code, setCode] = useState('1234');
-  
-  // 使用自定义 Hook
+
   const loginMutation = useLogin();
 
   const handleLogin = () => {
@@ -17,7 +25,7 @@ export default function Login() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Text style={styles.title}>用户登录</Text>
-        
+
         <View style={styles.form}>
           <TextInput
             style={styles.input}
@@ -33,13 +41,13 @@ export default function Login() {
             onChangeText={setCode}
             keyboardType="number-pad"
           />
-          
+
           {loginMutation.isPending ? (
-            <ActivityIndicator size="large" color="#0000ff" />
+            <ActivityIndicator size="large" color="#6366F1" />
           ) : (
             <Button title="登录" onPress={handleLogin} />
           )}
-          
+
           {loginMutation.isError && (
             <Text style={styles.errorText}>
               发生错误: {loginMutation.error?.message}
@@ -80,5 +88,5 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 10,
-  }
+  },
 });

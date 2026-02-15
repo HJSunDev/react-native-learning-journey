@@ -1,44 +1,56 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import type { User } from '../stores/authStore';
 
-// 注意：AsyncStorage 是非加密的持久化存储
-// 1. Android: 存储在 SQLite 数据库中
-// 2. iOS: 存储在沙盒目录的序列化文件中
-// 
-// 安全警告：
-// 严禁存储明文密码、支付密码等高敏感信息！
-// 对于普通的 Session Token 或用户偏好设置，使用 AsyncStorage 是通用的做法。
-// 如果需要存储高敏感数据，请改用 expo-secure-store (基于 Keychain/Keystore)。
+// ============================================================
+// 安全存储层 (Secure Storage) —— 基于 expo-secure-store
+// ============================================================
+// 底层实现:
+//   iOS  → Keychain Services (硬件级加密)
+//   Android → Keystore + EncryptedSharedPreferences
+// 适用范围: JWT Token、Refresh Token 等凭证类敏感数据
 
 const TOKEN_KEY = 'auth_token';
-const USER_INFO_KEY = 'user_info';
 
-export const storage = {
+export const secureStorage = {
   async getToken(): Promise<string | null> {
     try {
-      return await AsyncStorage.getItem(TOKEN_KEY);
+      return await SecureStore.getItemAsync(TOKEN_KEY);
     } catch (e) {
-      console.error('Error getting token', e);
+      console.error('Error getting token from secure storage', e);
       return null;
     }
   },
 
   async setToken(token: string): Promise<void> {
     try {
-      await AsyncStorage.setItem(TOKEN_KEY, token);
+      await SecureStore.setItemAsync(TOKEN_KEY, token);
     } catch (e) {
-      console.error('Error setting token', e);
+      console.error('Error setting token in secure storage', e);
     }
   },
 
   async clearToken(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(TOKEN_KEY);
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
     } catch (e) {
-      console.error('Error clearing token', e);
+      console.error('Error clearing token from secure storage', e);
     }
   },
+};
 
-  async setUserInfo(info: any): Promise<void> {
+// ============================================================
+// 通用存储层 (General Storage) —— 基于 AsyncStorage
+// ============================================================
+// 底层实现:
+//   Android → SQLite 数据库 (未加密)
+//   iOS     → 沙盒目录序列化文件 (未加密)
+// 适用范围: 用户偏好设置、缓存数据等非敏感信息
+
+const USER_INFO_KEY = 'user_info';
+
+export const storage = {
+  async setUserInfo(info: User): Promise<void> {
     try {
       await AsyncStorage.setItem(USER_INFO_KEY, JSON.stringify(info));
     } catch (e) {
@@ -46,7 +58,7 @@ export const storage = {
     }
   },
 
-  async getUserInfo(): Promise<any | null> {
+  async getUserInfo(): Promise<User | null> {
     try {
       const json = await AsyncStorage.getItem(USER_INFO_KEY);
       return json ? JSON.parse(json) : null;
@@ -55,13 +67,12 @@ export const storage = {
       return null;
     }
   },
-  
+
   async clearUserInfo(): Promise<void> {
     try {
       await AsyncStorage.removeItem(USER_INFO_KEY);
     } catch (e) {
       console.error('Error clearing user info', e);
     }
-  }
+  },
 };
-
