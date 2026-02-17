@@ -25,22 +25,26 @@ export default function LoginScreen() {
 
   /**
    * 布局策略：
-   * NativeWind v5 (preview) 在原生端存在 style/className 合并问题，
-   * 同一元素上同时使用 style 和 className 时，style 会覆盖 className。
-   * 因此：需要动态值的结构性容器仅用 style，纯展示子元素仅用 className。
+   * 1. style/className 不混用：需要动态值的结构性容器仅用 style，展示子元素仅用 className
+   * 2. 分层背景：基底为中性灰色，顶部 indigo 用绝对定位装饰层实现，
+   *    这样 iOS 半透明键盘弹出时，底部透出的是灰色而非 indigo
    */
   return (
-    // 最外层：仅用 style 处理 safe area + 背景色 + flex（需要动态 insets 值）
-    <View
-      style={{
-        flex: 1,
-        paddingTop: insets.top,
-        backgroundColor: "#4f46e5",
-      }}
-    >
-      {/* KAV：仅用 style 处理结构性 flex */}
+    <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
+      {/* 装饰层：绝对定位的 indigo 背景，只覆盖屏幕上半部分 */}
+      <View
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "50%",
+          backgroundColor: "#4f46e5",
+        }}
+      />
+
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingTop: insets.top }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
@@ -48,7 +52,7 @@ export default function LoginScreen() {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* 顶部品牌区域：纯 className，父级背景色透过来 */}
+          {/* 顶部品牌区域：透明背景，装饰层的 indigo 透过来 */}
           <View className="items-center px-8 pb-10 pt-16">
             <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-white/20">
               <Ionicons name="rocket-outline" size={40} color="white" />
@@ -59,7 +63,7 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          {/* 底部表单卡片区域：纯 className */}
+          {/* 底部表单卡片区域：圆角处透出装饰层的 indigo，形成视觉过渡 */}
           <View className="flex-1 rounded-t-[32px] bg-gray-50 px-8 pt-10">
             <View className="gap-4">
               {/* 手机号输入框 */}
