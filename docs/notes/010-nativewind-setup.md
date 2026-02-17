@@ -90,19 +90,25 @@ export default function WelcomeScreen() {
 
 ```tsx
 import { TextInput, View, Text, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function LoginForm() {
   return (
     <View className="w-full max-w-sm gap-4">
-      {/* 输入框：圆角 + 边框 + 内边距 + focus 状态 */}
-      <TextInput
-        className="rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-base text-gray-900 placeholder:text-gray-400"
-        placeholder="手机号"
-        keyboardType="phone-pad"
-      />
+      {/* 输入框：固定高度容器 + 图标 + TextInput 横向居中对齐 */}
+      {/* ⚠️ TextInput 使用 text-[16px] 而非 text-base，规避 iOS lineHeight bug（见第 4 节） */}
+      <View className="h-14 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4">
+        <Ionicons name="call-outline" size={20} color="#9CA3AF" />
+        <TextInput
+          className="ml-3 flex-1 text-[16px] text-gray-900"
+          placeholder="手机号"
+          placeholderTextColor="#D1D5DB"
+          keyboardType="phone-pad"
+        />
+      </View>
 
-      {/* 按钮：渐变色背景可用 bg-indigo-600 模拟，圆角 + 居中文本 */}
-      <Pressable className="items-center rounded-xl bg-indigo-600 py-3.5 active:bg-indigo-700">
+      {/* 按钮：Pressable + active: 伪类实现按下反馈 */}
+      <Pressable className="items-center rounded-2xl bg-indigo-600 py-4 active:bg-indigo-700">
         <Text className="text-base font-semibold text-white">
           登录
         </Text>
@@ -134,31 +140,36 @@ export default function LoginForm() {
 </View>
 ```
 
-### 场景 E: 与现有 StyleSheet 混合使用
+### 场景 E: style 与 className 的正确共存方式
+
+> **⚠️ 关键规则**：NativeWind v5 在 iOS/Android 原生端，同一元素上 `style` 会覆盖 `className`（而非合并）。
+> Web 端不受影响。详见第 4 节"平台陷阱"。
 
 ```tsx
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function MixedExample() {
+export default function SplitExample() {
+  const insets = useSafeAreaInsets();
+
   return (
-    // className 和 style 可以共存，style 的优先级更高
-    <View className="flex-1 bg-white" style={styles.shadow}>
-      <Text className="text-lg font-bold">混合写法</Text>
+    // ❌ 错误：同一元素混用 style + className，iOS 上 bg-indigo-600 不生效
+    // <View style={{ flex: 1, paddingTop: insets.top }} className="bg-indigo-600">
+
+    // ✅ 正确：分层隔离。结构性容器仅用 style，展示子元素仅用 className
+    <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#4f46e5' }}>
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-lg font-bold text-white">分层写法</Text>
+      </View>
     </View>
   );
 }
-
-// 一些复杂样式（如 shadow）保留 StyleSheet 写法
-const styles = StyleSheet.create({
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-});
 ```
+
+**什么时候需要 `style`**（仅以下三种场景）：
+1. **Safe Area Insets** — `paddingTop: insets.top`（动态运行时值）
+2. **Reanimated 动画值** — `useAnimatedStyle()` 返回的对象
+3. **JS 运算的动态尺寸** — 如根据屏幕高度计算的值
 
 ## 3. 深度原理与机制 (Under the Hood)
 
@@ -239,21 +250,25 @@ NativeWind v5 使用 Tailwind CSS v4 的 CSS-first 配置方式，在 `global.cs
    ```
    CSS 文件必须在应用最顶层组件中导入，且不能放在 `AppRegistry.registerComponent` 所在的文件中，否则 Fast Refresh 会失效。
 
-2. **优先使用 `className`，复杂样式降级到 `style`**
-   - 常规布局、颜色、字体 → `className`
-   - 复杂阴影、transform 动画 → `StyleSheet.create()`
-   - 两者可以在同一组件上共存
+2. **`style` 和 `className` 绝不混用在同一元素上**（详见下方"平台陷阱 A"）
+   - `className`：所有静态设计样式（颜色、间距、字体、圆角等）
+   - `style`：仅用于动态运行时值（Safe Area Insets、动画值、JS 计算尺寸）
+   - 当两者必须出现在同一区域时，用嵌套分层隔离
 
-3. **使用 `@theme` 统一管理 Design Token**
+3. **TextInput 使用 `text-[Npx]` 代替预设文字类**（详见下方"平台陷阱 B"）
+   - `text-base`、`text-sm` 等预设类会附带 `lineHeight`，在 iOS TextInput 中会导致文字偏下
+   - 改用 `text-[16px]`、`text-[14px]` 等只设 `fontSize`
+
+4. **使用 `@theme` 统一管理 Design Token**
    - 所有颜色、间距、字体大小等集中在 `global.css` 的 `@theme` 中定义
    - 组件中只使用 Token 名称（如 `bg-primary`），不直接写色值
 
-4. **首次启动务必清除缓存**
+5. **首次启动务必清除缓存**
    ```bash
    npx expo start --clear
    ```
 
-5. **安装 Tailwind CSS IntelliSense 编辑器插件**
+6. **安装 Tailwind CSS IntelliSense 编辑器插件**
    - VS Code / Cursor 中安装 `Tailwind CSS IntelliSense` 插件
    - 提供 class 名自动补全、悬停预览、错误提示
 
@@ -279,6 +294,74 @@ NativeWind v5 使用 Tailwind CSS v4 的 CSS-first 配置方式，在 `global.cs
 
 5. **不要忽略 `overrides` 中的 `lightningcss` 版本**
    未锁定版本会导致构建时 CSS 反序列化报错。
+
+### 🚨 iOS/Android 平台陷阱
+
+#### 平台陷阱 A：style 与 className 同一元素混用 → iOS 样式丢失
+
+**现象**：Web 端正常，但 iOS/Android 上 `className` 指定的背景色、圆角等样式完全不生效。
+
+**根因**：NativeWind v5 (preview) 在原生端的样式合并机制存在缺陷。当同一元素上同时存在 `style` 和 `className` 时，`style` 的样式对象会**覆盖**（而非合并）`className` 编译后的样式对象。Web 端使用 CSS 层叠机制，不受影响。
+
+**触发条件**：
+```tsx
+// 只要同一 JSX 元素上同时出现 style={...} 和 className="..." 就会触发
+<View style={{ flex: 1 }} className="bg-indigo-600 rounded-xl">
+//                                   ^^^^^^^^^^^^^^^^ ^^^^^^^^^ iOS 上全部丢失
+```
+
+**解决方案 — 分层隔离**：
+```tsx
+// 外层：style 处理动态值（safe area、flex 等结构性布局）
+<View style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#4f46e5' }}>
+  {/* 内层：className 处理所有视觉样式 */}
+  <View className="flex-1 rounded-xl px-6">
+    {/* 内容 */}
+  </View>
+</View>
+```
+
+**适用范围**：
+- 仅影响**原生端**（iOS / Android），Web 端不受影响
+- 仅在同一元素上同时使用 `style` + `className` 时触发
+- 子元素的 `className` 不受父元素 `style` 的影响
+
+---
+
+#### 平台陷阱 B：TextInput 预设文字类 → iOS 文字偏下不居中
+
+**现象**：TextInput 和同行图标用 `items-center` 对齐时，Web 端居中正确，但 iOS 上 TextInput 内的文字明显偏下。
+
+**根因**：React Native 的已知 bug（[facebook/react-native#45268](https://github.com/facebook/react-native/issues/45268)）。iOS 原生端的 TextInput 渲染 lineHeight 时，内部代码缺少 `usesFontLeading: NO` 设置（Text 组件有此设置），导致相同的 lineHeight 在 TextInput 中表现为文字向下偏移。
+
+Tailwind 的预设文字类（如 `text-base`）同时设置 `fontSize` 和 `lineHeight`，正是这个附带的 `lineHeight` 触发了 bug：
+
+| 类名 | 实际设置 | TextInput 上的效果 |
+|---|---|---|
+| `text-xs` | fontSize:12 + lineHeight:16 | ⚠️ 文字偏下 |
+| `text-sm` | fontSize:14 + lineHeight:20 | ⚠️ 文字偏下 |
+| `text-base` | fontSize:16 + lineHeight:24 | ⚠️ 文字偏下 |
+| `text-lg` | fontSize:18 + lineHeight:28 | ⚠️ 文字偏下 |
+| `text-[16px]` | fontSize:16（无 lineHeight） | ✅ 正常居中 |
+
+**解决方案**：
+```tsx
+// ❌ text-base 附带 lineHeight:24，触发 iOS TextInput bug
+<View className="h-14 flex-row items-center rounded-2xl bg-white px-4">
+  <Ionicons name="call-outline" size={20} color="#9CA3AF" />
+  <TextInput className="ml-3 flex-1 text-base text-gray-900" />
+</View>
+
+// ✅ text-[16px] 只设 fontSize，不产生 lineHeight，图标和文字完美对齐
+<View className="h-14 flex-row items-center rounded-2xl bg-white px-4">
+  <Ionicons name="call-outline" size={20} color="#9CA3AF" />
+  <TextInput className="ml-3 flex-1 text-[16px] text-gray-900" />
+</View>
+```
+
+**配套建议**：
+- 输入框容器使用固定高度（如 `h-14`）+ `items-center`，而非依赖 TextInput 自身的 padding 撑开高度
+- 仅 `TextInput` 需要规避此问题，`Text` 组件使用预设类（`text-base` 等）完全正常
 
 ## 5. 行动导向 (Action Guide)
 
@@ -372,6 +455,20 @@ import "../global.css";
 ```
 
 > 文件名不能是 `nativewind.d.ts`（与 node_modules 冲突）或与项目目录同名（如 `app.d.ts`）。
+
+同时需要在 `tsconfig.json` 的 `include` 数组中显式注册此文件（`npx expo start --clear` 可能会自动完成此步骤）：
+
+```json
+{
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
+}
+```
 
 ### Step 8: 清除缓存并启动
 
