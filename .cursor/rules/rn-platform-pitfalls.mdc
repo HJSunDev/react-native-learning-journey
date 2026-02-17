@@ -1,0 +1,34 @@
+---
+description: React Native 跨平台样式陷阱，涉及 NativeWind className/style 和 TextInput 时必须遵守
+alwaysApply: true
+---
+
+# React Native 平台样式陷阱
+
+## 1. 禁止在同一元素上混用 style 和 className
+
+NativeWind v5 在原生端，style 会覆盖 className（而非合并），导致 className 的样式全部丢失。
+
+```tsx
+// ❌ iOS 上 bg-indigo-600 不生效
+<View style={{ flex: 1, paddingTop: insets.top }} className="bg-indigo-600">
+
+// ✅ 结构性容器仅用 style，展示子元素仅用 className
+<View style={{ flex: 1, paddingTop: insets.top, backgroundColor: '#4f46e5' }}>
+  <View className="flex-1 items-center bg-indigo-600">
+```
+
+## 2. TextInput 禁止使用带 lineHeight 的文字类
+
+iOS 上 TextInput 的 lineHeight 渲染有 bug（RN#45268），文字会偏下，与同行图标不对齐。
+
+```tsx
+// ❌ text-base = fontSize:16 + lineHeight:24，iOS 文字偏下
+<TextInput className="text-base text-gray-900" />
+
+// ✅ text-[16px] 只设 fontSize，不产生 lineHeight
+<TextInput className="text-[16px] text-gray-900" />
+```
+
+受影响的类：`text-xs`/`text-sm`/`text-base`/`text-lg`/`text-xl` 等所有预设文字尺寸。
+仅 TextInput 需要规避，Text 组件不受影响。
