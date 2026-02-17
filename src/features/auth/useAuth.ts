@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { authApi } from './api';
-import { LoginParams } from './types';
+import type { LoginParams } from './types';
 
 export const useLogin = () => {
   const signIn = useAuthStore((s) => s.signIn);

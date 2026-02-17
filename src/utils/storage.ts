@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import type { User } from '../stores/authStore';
+import type { User } from '../features/auth/types';
 
 // ============================================================
 // 安全存储层 (Secure Storage) —— 基于 expo-secure-store

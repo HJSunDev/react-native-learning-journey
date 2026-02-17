@@ -1,5 +1,5 @@
 import { client } from '../../api/client';
-import { LoginParams, UserResponse } from './types';
+import { LoginParams, LoginResponse } from './types';
 
 // 模拟延迟函数
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -8,11 +8,11 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const IS_MOCK = true;
 
 export const authApi = {
-  login: async (params: LoginParams): Promise<UserResponse> => {
+  login: async (params: LoginParams): Promise<LoginResponse> => {
     // 策略模式：如果是 Mock，直接返回假数据
     if (IS_MOCK) {
       await delay(1000); // 模拟网络延迟
-      
+
       // 模拟简单的验证逻辑 (仅用于测试错误处理)
       if (params.code === '0000') throw new Error('验证码错误');
 
@@ -24,18 +24,15 @@ export const authApi = {
       };
     }
 
-    // 真实请求
-    // 注意：这里的返回值类型需要根据实际后端响应结构进行调整
-    // 如果后端包裹了 { data: UserResponse }，client 拦截器如果解包了，这里直接返回 UserResponse
-    return client.post('/auth/login', params);
+    // 真实请求，泛型参数确保返回类型为 LoginResponse
+    return client.post<LoginResponse>('/auth/login', params);
   },
 
   logout: async () => {
     if (IS_MOCK) {
-        await delay(500);
-        return true;
+      await delay(500);
+      return true;
     }
     return client.post('/auth/logout');
-  }
+  },
 };
-

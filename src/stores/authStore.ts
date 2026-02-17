@@ -1,11 +1,9 @@
 import { create } from 'zustand';
+import type { User } from '../features/auth/types';
 import { secureStorage, storage } from '../utils/storage';
 
-export interface User {
-  id: string;
-  username: string;
-  avatar: string;
-}
+// 从 features/auth/types.ts 统一导入 User 类型，避免重复定义和循环依赖
+export type { User };
 
 interface AuthState {
   /** 当前用户信息，null 表示未登录 */
