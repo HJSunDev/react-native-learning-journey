@@ -1,3 +1,5 @@
+import "../global.css";
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Href, Slot, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from 'react';
