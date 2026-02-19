@@ -13,11 +13,25 @@ export default function TabsLayout() {
         options={{
           title: "首页",
           tabBarIcon: ({ color, size, focused }) => (
-            focused ? (
-              <Ionicons name="home" size={size} color={color} />
-            ) : (
-              <Ionicons name="home-outline" size={size} color={color} />
-            )
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "我的",
+          headerShown: false,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={size}
+              color={color}
+            />
           ),
         }}
       />

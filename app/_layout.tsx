@@ -7,9 +7,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { useAuthStore } from '../src/stores/authStore';
 
 /**
- * 认证守卫：根据登录状态自动重定向。
- * - 已登录 + 在 auth 页面 → 跳转到主页
- * - 未登录 + 在受保护页面 → 跳转到登录页
+ * 认证守卫（单向门禁模式）：
+ * 仅阻止已登录用户重复进入认证页面，游客可自由浏览所有 Tab。
+ * 登录入口由 Profile Tab 的"登录"按钮主动触发，不做强制跳转。
  */
 function AuthGuard() {
   const { token, isLoading } = useAuthStore();
@@ -19,18 +19,14 @@ function AuthGuard() {
   useEffect(() => {
     if (isLoading) return;
 
-    // 判断当前是否处于 (auth) 路由组内
     // Typed Routes 在 dev server 重新启动前可能不包含新建的路由组，此处用 string 断言
     const inAuthGroup = (segments[0] as string) === '(auth)';
 
-    if (!token && !inAuthGroup) {
-      // 未登录且不在认证页面 → 重定向到登录
-      router.replace('/(auth)/login' as Href);
-    } else if (token && inAuthGroup) {
+    if (token && inAuthGroup) {
       // 已登录但还在认证页面 → 重定向到主页
       router.replace('/(tabs)' as Href);
     }
-  }, [token, isLoading, segments]);
+  }, [token, isLoading, segments, router]);
 
   // 应用启动时从持久化存储恢复登录态，期间显示加载指示器
   if (isLoading) {

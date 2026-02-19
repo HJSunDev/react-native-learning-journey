@@ -131,17 +131,17 @@ export default function Layout() {
         // 全局标题样式
         headerTitleStyle: { fontWeight: "600" },
         headerTintColor: "#333",
-      
+    
         // 全局导航栏样式
         headerStyle: { backgroundColor: "#fff" },
-      
+    
         // 全局动画
         animation: "slide_from_right",
-      
+    
         // 全局手势
         gestureEnabled: true,
         fullScreenGestureEnabled: true,
-      
+    
         // 自定义返回按钮（全局）
         headerLeft: () => <CustomBackIcon />,
       }}
@@ -332,12 +332,12 @@ import { Link } from "expo-router";
 
 **Link vs push 的关系：**
 
-| 特性 | `Link` 组件 | `router.push` |
-|------|-------------|---------------|
-| **导航方式** | 声明式（JSX） | 命令式（函数调用） |
-| **默认行为** | push（压栈） | push（压栈） |
+| 特性               | `Link` 组件    | `router.push`          |
+| ------------------ | ---------------- | ------------------------ |
+| **导航方式** | 声明式（JSX）    | 命令式（函数调用）       |
+| **默认行为** | push（压栈）     | push（压栈）             |
 | **使用场景** | 可点击的 UI 元素 | 条件判断、异步操作后跳转 |
-| **样式传递** | 支持 `asChild` | 不适用 |
+| **样式传递** | 支持 `asChild` | 不适用                   |
 
 **Link 的常用属性：**
 
@@ -443,6 +443,99 @@ import { Ionicons } from "@expo/vector-icons";
 <Ionicons name="home" size={24} color="black" />
 ```
 
+### 2.5 安全区域 (Safe Area)
+
+#### 2.5.1 核心概念
+
+现代手机屏幕有刘海（Notch）、圆角、状态栏、底部 Home Indicator 等非矩形区域。如果 UI 内容延伸到这些区域，就会被遮挡或截断。
+
+**安全区域（Safe Area）** 是操作系统告知应用的"可安全渲染内容"的矩形区域。`react-native-safe-area-context` 提供了获取这些边距值的能力。
+
+```
+┌──────────────────────────┐
+│       状态栏 (insets.top) │
+├──────────────────────────┤
+│                          │
+│      Safe Area           │
+│    （可安全渲染区域）      │
+│                          │
+├──────────────────────────┤
+│  Home Indicator (bottom) │
+└──────────────────────────┘
+```
+
+#### 2.5.2 Provider 的来源
+
+使用 `useSafeAreaInsets` 前需要外层有 `SafeAreaProvider`。在 Expo Router 项目中，**框架已在内部自动注入了 `SafeAreaProvider`**，无需手动包裹。可以在任何路由组件中直接调用 hook。
+
+#### 2.5.3 两种使用方式对比
+
+**方式一：`<SafeAreaView>` 组件（简单场景）**
+
+自动应用所有方向的安全区域 padding，适合不需要精细控制的页面：
+
+```tsx
+import { SafeAreaView } from "react-native-safe-area-context";
+
+export default function SimpleScreen() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Text>内容不会被状态栏或 Home Indicator 遮挡</Text>
+    </SafeAreaView>
+  );
+}
+```
+
+**方式二：`useSafeAreaInsets()` Hook（精细控制）**
+
+返回四个方向的像素值 `{ top, bottom, left, right }`，可按需选择性使用：
+
+```tsx
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export default function CustomScreen() {
+  const insets = useSafeAreaInsets();
+
+  // 只需要顶部避让状态栏，底部有 TabBar 自行处理
+  return (
+    <View style={{ flex: 1, paddingTop: insets.top }}>
+      <Text>精确控制顶部安全区域</Text>
+    </View>
+  );
+}
+```
+
+#### 2.5.4 如何选择
+
+| 场景                     | 推荐方式              | 原因                                                    |
+| ------------------------ | --------------------- | ------------------------------------------------------- |
+| 简单全屏页面             | `SafeAreaView`      | 四个方向一键处理，代码最少                              |
+| 只需部分方向避让         | `useSafeAreaInsets` | 如 Tab 页面只需 `paddingTop`，底部由 TabBar 覆盖      |
+| 背景色需延伸到状态栏     | `useSafeAreaInsets` | `SafeAreaView` 会在状态栏区域留白，无法实现沉浸式背景 |
+| 自定义 Header / 吸顶元素 | `useSafeAreaInsets` | 需要将 `insets.top` 加到自定义 Header 的高度中        |
+
+#### 2.5.5 典型模式
+
+**沉浸式背景 + 内容安全区域**（如 Profile Tab、Login 页）：
+
+```tsx
+export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
+
+  // 外层容器用 style 控制安全区域偏移和背景色
+  // 内层子组件仅用 className 控制展示样式
+  return (
+    <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: "#f9fafb" }}>
+      <ScrollView className="flex-1">
+        {/* 页面内容 */}
+      </ScrollView>
+    </View>
+  );
+}
+```
+
+这里不使用 `SafeAreaView`，是因为需要背景色从屏幕顶部边缘开始渲染（沉浸式），同时只有内容区域需要避让状态栏。Tab 页面的底部由 TabBar 占据，无需额外处理 `insets.bottom`。
+
 ---
 
 ## 3. 最佳实践 (Best Practices)
@@ -480,16 +573,16 @@ export default function RootLayout() {
     <Stack>
       {/* 主界面：Tabs，隐藏 Stack 头部 */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    
+  
       {/* 普通页面：继承 Stack 头部 */}
       <Stack.Screen name="product/[id]" options={{ title: "商品详情" }} />
-    
+  
       {/* 模态框：从底部弹出 */}
       <Stack.Screen 
         name="settings/index" 
         options={{ presentation: "modal", title: "设置" }} 
       />
-    
+  
       {/* 全屏页面：用于图片预览等 */}
       <Stack.Screen 
         name="image-viewer" 
@@ -612,3 +705,4 @@ import { StackScreenOptions } from "@/constants/Navigation";
 - [React Navigation Stack 文档](https://reactnavigation.org/docs/stack-navigator/)
 - [React Native 核心组件](https://reactnative.dev/docs/components-and-apis)
 - [Ionicons 图标目录](https://icons.expo.fyi/Index)
+- [react-native-safe-area-context 文档](https://docs.expo.dev/versions/latest/sdk/safe-area-context/)

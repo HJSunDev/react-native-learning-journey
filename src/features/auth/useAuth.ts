@@ -13,7 +13,7 @@ export const useLogin = () => {
       const { token, ...user } = data;
 
       // 写入 Zustand 内存状态 + 持久化存储（Token → SecureStore, 用户信息 → AsyncStorage）
-      // AuthGuard 监听 token 变化后会自动跳转到主页，无需手动 router.replace
+      // 若当前处于 (auth) 路由组，AuthGuard 检测到 token 后会自动 replace 回 (tabs)
       await signIn(token, user);
 
       console.log('登录成功', data);
@@ -31,7 +31,7 @@ export const useLogout = () => {
     mutationFn: () => authApi.logout(),
     onSuccess: async () => {
       // 清除内存状态 + 持久化存储
-      // AuthGuard 监听 token 变为 null 后会自动跳转到登录页
+      // 游客模式下无强制跳转，用户停留在当前页面（Profile Tab 自动渲染游客视图）
       await signOut();
     },
     onError: (error: Error) => {
