@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import AnimatedTabBar from "../../src/components/AnimatedTabBar";
 
 export default function TabsLayout() {
   return (
     <Tabs
+      tabBar={(props) => <AnimatedTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: "#6366F1",
       }}

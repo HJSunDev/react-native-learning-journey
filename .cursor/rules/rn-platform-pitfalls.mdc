@@ -32,3 +32,25 @@ iOS 上 TextInput 的 lineHeight 渲染有 bug（RN#45268），文字会偏下�
 
 受影响的类：`text-xs`/`text-sm`/`text-base`/`text-lg`/`text-xl` 等所有预设文字尺寸。
 仅 TextInput 需要规避，Text 组件不受影响。
+
+## 3. Tab Bar 的 tabBarStyle 中用 marginHorizontal 代替 left/right
+
+React Navigation 的 Tab Bar 在 iOS 原生端有内部布局约束（SafeArea 包裹、固定宽度），
+`tabBarStyle` 中的 `left`/`right` 会被覆盖导致不生效。`margin` 属于元素自身外边距，不受父容器定位约束影响。
+
+此问题仅限 Tab Bar 组件，普通 View 的 `position: 'absolute'` + `left`/`right` 在所有平台正常工作。
+
+```tsx
+// ❌ iOS 原生端 left/right 被 Tab Bar 内部布局覆盖，不生效
+tabBarStyle: {
+  position: "absolute",
+  left: 16,
+  right: 16,
+}
+
+// ✅ marginHorizontal 跨平台一致
+tabBarStyle: {
+  position: "absolute",
+  marginHorizontal: 16,
+}
+```

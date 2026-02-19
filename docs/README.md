@@ -19,8 +19,8 @@
 <!-- NEW_NOTES_START -->
 - **[005. Expo Router 路由与基础组件](notes/005-expo-router-basics.md)**
   - 涵盖文件路由、Stack/Tabs 布局嵌套、View/Text 组件及 StyleSheet 样式管理
-- **[007. Tabs 导航与底部导航栏设计](notes/006-tabs-navigation.md)**
-  - Tabs 核心概念与配置、徽章显示、自定义 TabBar、与 Stack 组合架构
+- **[007. Tabs 导航与底部导航栏设计](notes/007-tabs-navigation.md)**
+  - Tabs 核心概念与配置、徽章显示、自定义 TabBar、浮动毛玻璃 TabBar、与 Stack 组合架构
 - **[008. 客户端架构设计与 API 对接准备](notes/007-client-arch-and-api-setup.md)**
   - 总结前端网络层架构 (Axios + React Query) 及目录规范，包含 iOS 键盘交互处理
 - **[009. 全局认证状态管理与安全存储](notes/009-auth-state-and-secure-storage.md)**

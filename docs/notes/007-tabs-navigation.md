@@ -359,6 +359,103 @@ app/(tabs)/
     └── [id].tsx     # (tabs) 下的路由，href: null 故不在 TabBar 显示
 ```
 
+### 3.5 浮动 TabBar 与毛玻璃效果
+
+#### 基础浮动版
+
+通过 `position: 'absolute'` 使 TabBar 脱离文档流，配合 `marginHorizontal` 和 `borderRadius` 形成悬浮卡片效果：
+
+```tsx
+import { Platform } from "react-native";
+
+<Tabs
+  screenOptions={{
+    tabBarStyle: {
+      position: "absolute",
+      bottom: Platform.OS === "ios" ? 24 : 16,
+      marginHorizontal: 16,
+      height: 64,
+      borderRadius: 20,
+      backgroundColor: "rgba(255, 255, 255, 0.92)",
+      borderTopWidth: 0,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 8,
+      paddingBottom: 0,
+    },
+    tabBarItemStyle: {
+      paddingVertical: 8,
+    },
+  }}
+>
+```
+
+**注意**：水平缩进必须用 `marginHorizontal` 而非 `left`/`right`。React Navigation 的 Tab Bar 在 iOS 原生端有内部布局约束，`left`/`right` 会被覆盖不生效。详见 `rn-platform-pitfalls` 规则第 3 条。
+
+#### 毛玻璃版（expo-blur）
+
+`expo-blur` 提供 `BlurView` 组件，利用**平台原生的高斯模糊能力**在 View 背后渲染模糊效果。它不是截图再滤镜，而是调用 iOS 的 `UIVisualEffectView` / Android 的 `RenderEffect`，性能接近原生。
+
+配合 `tabBarBackground` 选项可在不自定义整个 TabBar 的前提下替换背景层：
+
+```tsx
+import { BlurView } from "expo-blur";
+import { Platform, StyleSheet, View } from "react-native";
+
+<Tabs
+  screenOptions={{
+    tabBarStyle: {
+      position: "absolute",
+      bottom: Platform.OS === "ios" ? 24 : 16,
+      marginHorizontal: 16,
+      height: 64,
+      borderRadius: 20,
+      borderTopWidth: 0,
+      backgroundColor: "transparent",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 8,
+      paddingBottom: 0,
+      overflow: "hidden",    // 裁切 BlurView 使其跟随 borderRadius
+    },
+    tabBarBackground: () => (
+      <View style={StyleSheet.absoluteFill}>
+        <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+        {/* 半透明白色遮罩：保留 TabBar 可见底色，同时透出轻微模糊感 */}
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: "rgba(255, 255, 255, 0.78)" },
+          ]}
+        />
+      </View>
+    ),
+    tabBarItemStyle: {
+      paddingVertical: 8,
+    },
+  }}
+>
+```
+
+**关键参数**：
+
+| 参数 | 说明 |
+|---|---|
+| `intensity` | 模糊强度（0-100），值越大越模糊 |
+| `tint` | 色调叠加：`light`（白色系）、`dark`（暗色系）、`default`（自动） |
+
+**跨平台行为差异**：
+
+| 平台 | 效果 |
+|---|---|
+| **iOS** | 调用 `UIVisualEffectView`，真正的实时高斯模糊，效果最佳 |
+| **Android** | Android 12+ 使用 `RenderEffect` 实现模糊；低版本 fallback 为半透明遮罩 |
+| **Web** | 使用 CSS `backdrop-filter: blur()`，主流浏览器均支持 |
+
 ---
 
 ## 4. Tabs 与 Stack 组合架构
