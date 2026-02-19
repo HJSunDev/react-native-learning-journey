@@ -27,6 +27,8 @@
   - Zustand 全局 Auth 状态、expo-secure-store 加密存储、AuthGuard 路由守卫与路由重构
 - **[010. NativeWind 样式引擎集成与最佳实践](notes/010-nativewind-setup.md)**
   - NativeWind v5 集成配置、Tailwind CSS utility-first 用法、Design Token 体系与未来组件库扩展路线
+- **[011. React Native 交互事件体系](notes/011-rn-interaction-events.md)**
+  - Pressable 生命周期、TextInput 事件、键盘管理、滚动/列表交互、Gesture Handler 手势系统、触觉反馈
 
 <!-- 这是一个锚点，AI 会自动识别这里并追加新链接 -->
 
