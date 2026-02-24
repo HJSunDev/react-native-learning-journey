@@ -38,8 +38,8 @@
 
 > 补齐独立开发 App 所需的核心拼图。完成本阶段即具备交付完整产品的能力。
 
-- 🔲 **012. 列表与数据流**
-  - FlatList 核心 API → FlashList 生产落地、SectionList 分组场景、分页加载 (useInfiniteQuery)、下拉刷新、列表状态模式 (空/加载/错误)
+- **[012. 列表与数据流](notes/012-list-and-data-flow.md)**
+  - FlatList 核心 API → FlashList 生产落地、SectionList 分组场景、分页加载 (useInfiniteQuery)、下拉刷新、列表状态模式 (空/加载/错误)、Cell 回收复用原理与状态陷阱
 - 🔲 **013. 表单体系**
   - react-hook-form + Zod 校验集成、复杂表单模式 (多步骤/动态字段)、原生选择器 (Picker/DateTimePicker)、表单 UX
 - 🔲 **014. 图片与媒体**

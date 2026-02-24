@@ -24,6 +24,20 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="explore"
+        options={{
+          title: "发现",
+          headerShown: false,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "compass" : "compass-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "我的",
