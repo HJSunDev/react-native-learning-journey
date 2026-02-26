@@ -32,6 +32,7 @@ const DEMO_SECTIONS: DemoSection[] = [
     description: '图片选择、裁剪压缩、上传进度',
     icon: 'image-outline',
     tags: ['expo-image', 'expo-image-picker'],
+    route: '/media-lab' as Href,
   },
   {
     id: 'navigation',

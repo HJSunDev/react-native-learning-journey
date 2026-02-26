@@ -28,6 +28,13 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "允许 rn-journey 访问相册以选择图片",
+          "cameraPermission": "允许 rn-journey 使用相机以拍照"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
