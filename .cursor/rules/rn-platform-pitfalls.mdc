@@ -1,5 +1,5 @@
 ---
-description: React Native 跨平台样式陷阱，涉及 NativeWind className/style 和 TextInput 时必须遵守
+description: React Native 跨平台样式/渲染陷阱，涉及 NativeWind className/style、TextInput、iOS 26 导航栏等场景时必须遵守
 alwaysApply: true
 ---
 
@@ -54,3 +54,29 @@ tabBarStyle: {
   marginHorizontal: 16,
 }
 ```
+
+## 4. iOS 26 Liquid Glass：需要自定义样式的 Header 必须用 `header` prop 替换原生导航栏
+
+iOS 26 对 UINavigationBar 的所有 UIBarButtonItem 强制应用 Liquid Glass（毛玻璃气泡），
+无论 `headerLeft` 还是 `unstable_headerLeftItems`，内部都会被包裹为 UIBarButtonItem，自动获得系统级的半透明背景。
+
+`hidesSharedBackground` 属性虽然在 `@react-navigation/native-stack` 类型中已定义，
+但 `react-native-screens < 4.17` 的原生层未实现此接口，设置无效。
+
+生产级做法是通过 Stack 的 `header` prop 提供完全自定义的 React 组件，彻底绕过原生 UINavigationBar：
+
+```tsx
+// ❌ headerLeft / unstable_headerLeftItems 会被 iOS 26 包裹为带 Liquid Glass 的 UIBarButtonItem
+screenOptions={{
+  headerLeft: () => <Pressable>...</Pressable>,
+}}
+
+// ✅ 用 header prop 替换整个原生导航栏，跨平台一致，不受系统样式干预
+screenOptions={{
+  header: ({ options, route }) => (
+    <ScreenHeader title={options.title ?? route.name} />
+  ),
+}}
+```
+
+此方案的代价是失去原生 Header 的推入/弹出动画（Header 会随整个页面一起过渡），对绝大多数业务场景可接受。

@@ -1,7 +1,7 @@
 import "../global.css";
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Href, Slot, useRouter, useSegments } from "expo-router";
+import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuthStore } from '../src/stores/authStore';
@@ -37,7 +37,13 @@ function AuthGuard() {
     );
   }
 
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(screens)" />
+    </Stack>
+  );
 }
 
 export default function RootLayout() {
