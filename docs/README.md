@@ -46,8 +46,8 @@
   - expo-image 高性能展示 (缓存/blurhash/contentFit)、expo-image-picker (相册/拍照/多选)、expo-image-manipulator 链式处理 (压缩/缩放)、上传流程 (FormData + 进度)、FormImagePicker 表单集成
 - **[015. 导航进阶](notes/015-advanced-navigation.md)**
   - Modal 呈现模式 (presentation: 'modal')、@gorhom/bottom-sheet 手势面板、动态路由 [id].tsx (useLocalSearchParams)、Deep Linking (URL Scheme)、页面传参方式对比
-- 🔲 **016. 暗色模式与主题系统**
-  - useColorScheme + NativeWind dark: 实战、主题切换 (跟随系统/手动/持久化)、状态栏与导航栏联动、Design Token 驱动主题架构
+- **[016. 暗色模式与主题系统](notes/016-dark-mode-and-theming.md)**
+  - Appearance API + Zustand 持久化主题偏好、NativeWind dark: 前缀全局适配、useColorScheme 条件渲染、StatusBar 联动、三路模式切换 (跟随系统/浅色/深色)
 
 ## 📱 阶段四：设备与平台能力
 

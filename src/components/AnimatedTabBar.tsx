@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
 } from "react-native";
 import Animated, {
@@ -16,8 +17,6 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
-const ACTIVE_COLOR = "#374151"; // gray-700：选中时图标/文字
-const INACTIVE_COLOR = "#9CA3AF"; // gray-400：未选中
 const BAR_HEIGHT = 64;
 const CAPSULE_HEIGHT = 48;
 // 胶囊与外框共享同一圆角半径，视觉上更协调
@@ -25,8 +24,25 @@ const BORDER_RADIUS = CAPSULE_HEIGHT / 0.7;
 // 胶囊宽度占 Tab 格子的比例，控制胶囊的紧凑程度
 const CAPSULE_WIDTH_RATIO = 0.48;
 
-// 冷灰色调在白色 bar 上产生可见的玻璃色差
-const CAPSULE_GLASS_TINT = "rgba(155, 165, 180, 0.22)";
+// 浅色 / 深色 模式的颜色映射
+const THEME = {
+  light: {
+    activeColor: "#374151",       // gray-700
+    inactiveColor: "#9CA3AF",     // gray-400
+    blurTint: "light" as const,
+    barOverlay: "rgba(255, 255, 255, 0.80)",
+    capsuleGlass: "rgba(155, 165, 180, 0.22)",
+    capsuleBorder: "rgba(255, 255, 255, 0.75)",
+  },
+  dark: {
+    activeColor: "#F3F4F6",       // gray-100
+    inactiveColor: "#6B7280",     // gray-500
+    blurTint: "dark" as const,
+    barOverlay: "rgba(15, 15, 20, 0.82)",
+    capsuleGlass: "rgba(100, 115, 135, 0.30)",
+    capsuleBorder: "rgba(255, 255, 255, 0.08)",
+  },
+};
 
 interface TabLayout {
   x: number;
@@ -47,12 +63,16 @@ function getCapsuleLayout(tab: TabLayout) {
  * - 胶囊指示器紧凑居中，不铺满 Tab 全宽
  * - 切换时以 Q 弹弹簧横向滑动，带过冲回弹
  * - 胶囊内嵌毛玻璃，移动时纵向拉伸并变得更通透
+ * - 自动响应系统 / 用户设定的暗色模式
  */
 export default function AnimatedTabBar({
   state,
   descriptors,
   navigation,
 }: BottomTabBarProps) {
+  const colorScheme = useColorScheme();
+  const theme = THEME[colorScheme === "dark" ? "dark" : "light"];
+
   const [tabLayouts, setTabLayouts] = useState<TabLayout[]>([]);
 
   const capsuleX = useSharedValue(0);
@@ -145,20 +165,38 @@ export default function AnimatedTabBar({
     >
       {/* 毛玻璃背景层 */}
       <View style={[StyleSheet.absoluteFill, styles.bgClip]}>
-        <BlurView intensity={40} tint="light" style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={40}
+          tint={theme.blurTint}
+          style={StyleSheet.absoluteFill}
+        />
         <View
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: "rgba(255, 255, 255, 0.80)" },
+            { backgroundColor: theme.barOverlay },
           ]}
         />
       </View>
 
       {/* 胶囊指示器：内嵌毛玻璃，居中于选中 Tab */}
-      <Animated.View style={[styles.capsule, capsuleStyle]}>
-        <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
+      <Animated.View
+        style={[
+          styles.capsule,
+          { borderColor: theme.capsuleBorder },
+          capsuleStyle,
+        ]}
+      >
+        <BlurView
+          intensity={80}
+          tint={theme.blurTint}
+          style={StyleSheet.absoluteFill}
+        />
         <Animated.View
-          style={[StyleSheet.absoluteFill, styles.glassTint, glassTintStyle]}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: theme.capsuleGlass, borderRadius: BORDER_RADIUS },
+            glassTintStyle,
+          ]}
         />
       </Animated.View>
 
@@ -178,13 +216,13 @@ export default function AnimatedTabBar({
           >
             {options.tabBarIcon?.({
               focused: isFocused,
-              color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
+              color: isFocused ? theme.activeColor : theme.inactiveColor,
               size: 22,
             })}
             <Text
               style={[
                 styles.label,
-                { color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR },
+                { color: isFocused ? theme.activeColor : theme.inactiveColor },
                 isFocused && styles.labelActive,
               ]}
             >
@@ -228,11 +266,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.75)",
-  },
-  glassTint: {
-    backgroundColor: CAPSULE_GLASS_TINT,
-    borderRadius: BORDER_RADIUS,
   },
   tabItem: {
     flex: 1,

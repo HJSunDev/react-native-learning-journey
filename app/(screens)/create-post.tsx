@@ -59,7 +59,7 @@ export default function CreatePostScreen() {
       <Stack.Screen options={{ title: '发布动态' }} />
 
       <KeyboardAvoidingView
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-gray-50 dark:bg-gray-950"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView

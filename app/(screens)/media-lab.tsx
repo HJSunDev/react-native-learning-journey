@@ -9,6 +9,7 @@ import {
   Pressable,
   ScrollView,
   Text,
+  useColorScheme,
   View,
 } from 'react-native';
 import { z } from 'zod';
@@ -22,7 +23,6 @@ import {
   takePhoto,
   type PickedImage,
   type ProcessedImage,
-  type UploadProgress,
 } from '../../src/features/media';
 import { zodResolver } from '../../src/utils/zodResolver';
 
@@ -63,10 +63,14 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <View className="mb-4 rounded-2xl bg-white p-4">
-      <Text className="text-base font-semibold text-gray-900">{title}</Text>
+    <View className="mb-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
+      <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
+        {title}
+      </Text>
       {description && (
-        <Text className="mt-1 text-sm text-gray-400">{description}</Text>
+        <Text className="mt-1 text-sm text-gray-400 dark:text-gray-500">
+          {description}
+        </Text>
       )}
       <View className="mt-4">{children}</View>
     </View>
@@ -93,12 +97,14 @@ function ChipGroup({
             className={`rounded-full border px-3 py-1.5 ${
               isSelected
                 ? 'border-indigo-600 bg-indigo-600'
-                : 'border-gray-200 bg-gray-50 active:bg-gray-100'
+                : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600'
             }`}
           >
             <Text
               className={`text-sm ${
-                isSelected ? 'font-medium text-white' : 'text-gray-600'
+                isSelected
+                  ? 'font-medium text-white'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               {opt.label}
@@ -117,10 +123,9 @@ function ChipGroup({
 function ExpoImageSection() {
   const [loadKey, setLoadKey] = useState(0);
   const [mounted, setMounted] = useState(true);
+  const isDark = useColorScheme() === 'dark';
 
   const handleReload = () => {
-    // 先卸载 Image 组件，让 blurhash 占位符显示出来；
-    // 再挂载新 URL 触发网络请求，过渡动画在加载完成后播放
     setMounted(false);
     setTimeout(() => {
       setLoadKey((k) => k + 1);
@@ -134,7 +139,7 @@ function ExpoImageSection() {
       description="contentFit 对比 · blurhash 占位符 · 过渡动画"
     >
       {/* contentFit 对比 */}
-      <Text className="mb-2 text-sm font-medium text-gray-700">
+      <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
         contentFit 模式对比
       </Text>
       <View className="flex-row gap-2">
@@ -145,7 +150,7 @@ function ExpoImageSection() {
                 height: 100,
                 borderRadius: 12,
                 overflow: 'hidden',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: isDark ? '#1f2937' : '#f3f4f6',
               }}
             >
               <Image
@@ -154,7 +159,7 @@ function ExpoImageSection() {
                 contentFit={mode}
               />
             </View>
-            <Text className="mt-1 text-center text-xs text-gray-500">
+            <Text className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
               {mode}
             </Text>
           </View>
@@ -162,7 +167,7 @@ function ExpoImageSection() {
       </View>
 
       {/* blurhash + transition */}
-      <Text className="mb-2 mt-5 text-sm font-medium text-gray-700">
+      <Text className="mb-2 mt-5 text-sm font-medium text-gray-700 dark:text-gray-300">
         blurhash 占位符 + 过渡动画
       </Text>
       <View className="flex-row gap-3">
@@ -185,7 +190,7 @@ function ExpoImageSection() {
               />
             )}
           </View>
-          <Text className="mt-1 text-center text-xs text-gray-500">
+          <Text className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
             有 blurhash
           </Text>
         </View>
@@ -195,7 +200,7 @@ function ExpoImageSection() {
               height: 140,
               borderRadius: 12,
               overflow: 'hidden',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: isDark ? '#1f2937' : '#f3f4f6',
             }}
           >
             {mounted && (
@@ -207,7 +212,7 @@ function ExpoImageSection() {
               />
             )}
           </View>
-          <Text className="mt-1 text-center text-xs text-gray-500">
+          <Text className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
             无占位符
           </Text>
         </View>
@@ -215,11 +220,11 @@ function ExpoImageSection() {
 
       <Pressable
         onPress={handleReload}
-        className="mt-3 items-center rounded-xl bg-gray-100 py-2.5 active:bg-gray-200"
+        className="mt-3 items-center rounded-xl bg-gray-100 dark:bg-gray-700 py-2.5 active:bg-gray-200 dark:active:bg-gray-600"
       >
         <View className="flex-row items-center gap-1.5">
-          <Ionicons name="refresh" size={16} color="#6B7280" />
-          <Text className="text-sm text-gray-600">
+          <Ionicons name="refresh" size={16} color={isDark ? '#D1D5DB' : '#6B7280'} />
+          <Text className="text-sm text-gray-600 dark:text-gray-400">
             重新加载（观察占位效果）
           </Text>
         </View>
@@ -238,6 +243,7 @@ function PickAndProcessSection() {
   const [quality, setQuality] = useState<number | undefined>(0.7);
   const [maxWidth, setMaxWidth] = useState<number | undefined>(800);
   const [isProcessing, setIsProcessing] = useState(false);
+  const isDark = useColorScheme() === 'dark';
 
   const handlePickFromGallery = async () => {
     try {
@@ -288,17 +294,21 @@ function PickAndProcessSection() {
       <View className="flex-row gap-2">
         <Pressable
           onPress={handlePickFromGallery}
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl bg-indigo-50 py-3 active:bg-indigo-100"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 py-3 active:bg-indigo-100 dark:active:bg-indigo-900"
         >
-          <Ionicons name="images-outline" size={18} color="#6366F1" />
-          <Text className="text-sm font-medium text-indigo-600">相册选取</Text>
+          <Ionicons name="images-outline" size={18} color={isDark ? '#818CF8' : '#6366F1'} />
+          <Text className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+            相册选取
+          </Text>
         </Pressable>
         <Pressable
           onPress={handleTakePhoto}
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl bg-indigo-50 py-3 active:bg-indigo-100"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 py-3 active:bg-indigo-100 dark:active:bg-indigo-900"
         >
-          <Ionicons name="camera-outline" size={18} color="#6366F1" />
-          <Text className="text-sm font-medium text-indigo-600">拍照</Text>
+          <Ionicons name="camera-outline" size={18} color={isDark ? '#818CF8' : '#6366F1'} />
+          <Text className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+            拍照
+          </Text>
         </Pressable>
       </View>
 
@@ -306,7 +316,7 @@ function PickAndProcessSection() {
         <>
           {/* 原始图片 */}
           <View className="mt-4">
-            <Text className="mb-2 text-sm font-medium text-gray-700">
+            <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               原始图片
             </Text>
             <View
@@ -314,7 +324,7 @@ function PickAndProcessSection() {
                 height: 200,
                 borderRadius: 12,
                 overflow: 'hidden',
-                backgroundColor: '#f3f4f6',
+                backgroundColor: isDark ? '#1f2937' : '#f3f4f6',
               }}
             >
               <Image
@@ -323,7 +333,7 @@ function PickAndProcessSection() {
                 contentFit="contain"
               />
             </View>
-            <Text className="mt-1.5 text-xs text-gray-400">
+            <Text className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
               {source.width} x {source.height}
               {source.fileSize ? ` · ${formatFileSize(source.fileSize)}` : ''}
             </Text>
@@ -332,7 +342,7 @@ function PickAndProcessSection() {
           {/* 处理参数 */}
           <View className="mt-4 gap-3">
             <View>
-              <Text className="mb-2 text-sm font-medium text-gray-700">
+              <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 压缩质量
               </Text>
               <ChipGroup
@@ -342,7 +352,7 @@ function PickAndProcessSection() {
               />
             </View>
             <View>
-              <Text className="mb-2 text-sm font-medium text-gray-700">
+              <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 最大宽度 (px)
               </Text>
               <ChipGroup
@@ -371,7 +381,7 @@ function PickAndProcessSection() {
           {/* 处理结果 */}
           {result && (
             <View className="mt-4">
-              <Text className="mb-2 text-sm font-medium text-gray-700">
+              <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 处理结果
               </Text>
               <View
@@ -379,7 +389,7 @@ function PickAndProcessSection() {
                   height: 200,
                   borderRadius: 12,
                   overflow: 'hidden',
-                  backgroundColor: '#f3f4f6',
+                  backgroundColor: isDark ? '#1f2937' : '#f3f4f6',
                 }}
               >
                 <Image
@@ -388,15 +398,15 @@ function PickAndProcessSection() {
                   contentFit="contain"
                 />
               </View>
-              <Text className="mt-1.5 text-xs text-gray-400">
+              <Text className="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
                 {result.width} x {result.height}
                 {result.fileSize ? ` · ${formatFileSize(result.fileSize)}` : ''}
               </Text>
 
               {/* 压缩效果对比 */}
               {source.fileSize != null && result.fileSize != null && (
-                <View className="mt-3 rounded-xl bg-green-50 p-3">
-                  <Text className="text-sm text-green-700">
+                <View className="mt-3 rounded-xl bg-green-50 dark:bg-green-950 p-3">
+                  <Text className="text-sm text-green-700 dark:text-green-400">
                     体积减少{' '}
                     {Math.round(
                       (1 - result.fileSize / source.fileSize) * 100,
@@ -425,6 +435,7 @@ function UploadSection() {
   >('idle');
   const [progress, setProgress] = useState(0);
   const cancelRef = useRef<(() => void) | null>(null);
+  const isDark = useColorScheme() === 'dark';
 
   const handlePick = async () => {
     try {
@@ -475,10 +486,10 @@ function UploadSection() {
       {!imageUri ? (
         <Pressable
           onPress={handlePick}
-          className="items-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 py-8 active:bg-gray-100"
+          className="items-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 py-8 active:bg-gray-100 dark:active:bg-gray-600"
         >
-          <Ionicons name="cloud-upload-outline" size={32} color="#9CA3AF" />
-          <Text className="mt-2 text-sm text-gray-400">
+          <Ionicons name="cloud-upload-outline" size={32} color={isDark ? '#6B7280' : '#9CA3AF'} />
+          <Text className="mt-2 text-sm text-gray-400 dark:text-gray-500">
             选择图片以模拟上传
           </Text>
         </Pressable>
@@ -489,7 +500,7 @@ function UploadSection() {
               height: 160,
               borderRadius: 12,
               overflow: 'hidden',
-              backgroundColor: '#f3f4f6',
+              backgroundColor: isDark ? '#1f2937' : '#f3f4f6',
             }}
           >
             <Image
@@ -502,7 +513,7 @@ function UploadSection() {
           {/* 进度条 */}
           {uploadState === 'uploading' && (
             <View className="mt-3">
-              <View className="h-2 overflow-hidden rounded-full bg-gray-100">
+              <View className="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                 <View
                   style={{
                     width: `${progress}%`,
@@ -512,7 +523,7 @@ function UploadSection() {
                   }}
                 />
               </View>
-              <Text className="mt-1.5 text-center text-xs text-gray-400">
+              <Text className="mt-1.5 text-center text-xs text-gray-400 dark:text-gray-500">
                 {progress}%
               </Text>
             </View>
@@ -520,15 +531,15 @@ function UploadSection() {
 
           {/* 状态提示 */}
           {uploadState === 'success' && (
-            <View className="mt-3 rounded-xl bg-green-50 p-3">
-              <Text className="text-center text-sm text-green-700">
+            <View className="mt-3 rounded-xl bg-green-50 dark:bg-green-950 p-3">
+              <Text className="text-center text-sm text-green-700 dark:text-green-400">
                 上传成功
               </Text>
             </View>
           )}
           {uploadState === 'error' && (
-            <View className="mt-3 rounded-xl bg-red-50 p-3">
-              <Text className="text-center text-sm text-red-600">
+            <View className="mt-3 rounded-xl bg-red-50 dark:bg-red-950 p-3">
+              <Text className="text-center text-sm text-red-600 dark:text-red-400">
                 上传失败
               </Text>
             </View>
@@ -549,9 +560,9 @@ function UploadSection() {
             {uploadState === 'uploading' && (
               <Pressable
                 onPress={handleCancel}
-                className="flex-1 items-center rounded-xl bg-red-50 py-3 active:bg-red-100"
+                className="flex-1 items-center rounded-xl bg-red-50 dark:bg-red-950 py-3 active:bg-red-100 dark:active:bg-red-900"
               >
-                <Text className="text-sm font-medium text-red-600">
+                <Text className="text-sm font-medium text-red-600 dark:text-red-400">
                   取消上传
                 </Text>
               </Pressable>
@@ -560,9 +571,9 @@ function UploadSection() {
               <>
                 <Pressable
                   onPress={handlePick}
-                  className="flex-1 items-center rounded-xl bg-gray-100 py-3 active:bg-gray-200"
+                  className="flex-1 items-center rounded-xl bg-gray-100 dark:bg-gray-700 py-3 active:bg-gray-200 dark:active:bg-gray-600"
                 >
-                  <Text className="text-sm font-medium text-gray-600">
+                  <Text className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     重新选择
                   </Text>
                 </Pressable>
@@ -635,9 +646,11 @@ function FormImagePickerSection() {
         </Pressable>
         <Pressable
           onPress={() => reset()}
-          className="items-center rounded-xl bg-gray-100 px-5 py-3 active:bg-gray-200"
+          className="items-center rounded-xl bg-gray-100 dark:bg-gray-700 px-5 py-3 active:bg-gray-200 dark:active:bg-gray-600"
         >
-          <Text className="text-sm font-medium text-gray-600">重置</Text>
+          <Text className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            重置
+          </Text>
         </Pressable>
       </View>
     </SectionCard>
@@ -654,7 +667,7 @@ export default function MediaLabScreen() {
       <Stack.Screen options={{ title: '图片与媒体' }} />
 
       <ScrollView
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-gray-50 dark:bg-gray-950"
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >

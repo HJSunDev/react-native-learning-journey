@@ -53,7 +53,7 @@ export default function HomeScreen() {
   if (isError) return <ListError message={error.message} onRetry={refetch} />;
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50 dark:bg-gray-950">
       <FlashList
         data={posts}
         renderItem={renderItem}

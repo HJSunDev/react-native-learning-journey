@@ -5,7 +5,7 @@ import {
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ShareOption {
@@ -14,14 +14,15 @@ interface ShareOption {
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
   bgColor: string;
+  darkBgColor: string;
 }
 
 const SHARE_OPTIONS: ShareOption[] = [
-  { id: 'link', label: '复制链接', icon: 'link-outline', color: '#6366F1', bgColor: '#EEF2FF' },
-  { id: 'wechat', label: '微信', icon: 'chatbubble-ellipses-outline', color: '#22C55E', bgColor: '#F0FDF4' },
-  { id: 'weibo', label: '微博', icon: 'globe-outline', color: '#EF4444', bgColor: '#FEF2F2' },
-  { id: 'save', label: '保存图片', icon: 'download-outline', color: '#F59E0B', bgColor: '#FFFBEB' },
-  { id: 'more', label: '更多', icon: 'ellipsis-horizontal', color: '#6B7280', bgColor: '#F3F4F6' },
+  { id: 'link', label: '复制链接', icon: 'link-outline', color: '#6366F1', bgColor: '#EEF2FF', darkBgColor: '#312E81' },
+  { id: 'wechat', label: '微信', icon: 'chatbubble-ellipses-outline', color: '#22C55E', bgColor: '#F0FDF4', darkBgColor: '#14532D' },
+  { id: 'weibo', label: '微博', icon: 'globe-outline', color: '#EF4444', bgColor: '#FEF2F2', darkBgColor: '#450A0A' },
+  { id: 'save', label: '保存图片', icon: 'download-outline', color: '#F59E0B', bgColor: '#FFFBEB', darkBgColor: '#451A03' },
+  { id: 'more', label: '更多', icon: 'ellipsis-horizontal', color: '#6B7280', bgColor: '#F3F4F6', darkBgColor: '#374151' },
 ];
 
 interface ShareSheetProps {
@@ -41,6 +42,7 @@ interface ShareSheetProps {
 export const ShareSheet = forwardRef<BottomSheetModal, ShareSheetProps>(
   function ShareSheet({ title, url }, ref) {
     const insets = useSafeAreaInsets();
+    const isDark = useColorScheme() === 'dark';
 
     const renderBackdrop = useCallback(
       (props: any) => (
@@ -67,13 +69,20 @@ export const ShareSheet = forwardRef<BottomSheetModal, ShareSheetProps>(
         ref={ref}
         enableDynamicSizing
         backdropComponent={renderBackdrop}
-        handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 36 }}
-        backgroundStyle={{ borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+        handleIndicatorStyle={{
+          backgroundColor: isDark ? '#4B5563' : '#D1D5DB',
+          width: 36,
+        }}
+        backgroundStyle={{
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+        }}
       >
         <BottomSheetView
           style={{ paddingBottom: insets.bottom + 8 }}
         >
-          <Text className="px-5 pb-3 text-base font-semibold text-gray-900">
+          <Text className="px-5 pb-3 text-base font-semibold text-gray-900 dark:text-gray-100">
             分享到
           </Text>
 
@@ -91,7 +100,7 @@ export const ShareSheet = forwardRef<BottomSheetModal, ShareSheetProps>(
                     borderRadius: 24,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: option.bgColor,
+                    backgroundColor: isDark ? option.darkBgColor : option.bgColor,
                   }}
                 >
                   <Ionicons
@@ -100,7 +109,7 @@ export const ShareSheet = forwardRef<BottomSheetModal, ShareSheetProps>(
                     color={option.color}
                   />
                 </View>
-                <Text className="mt-1.5 text-xs text-gray-600">
+                <Text className="mt-1.5 text-xs text-gray-600 dark:text-gray-400">
                   {option.label}
                 </Text>
               </Pressable>
@@ -109,12 +118,14 @@ export const ShareSheet = forwardRef<BottomSheetModal, ShareSheetProps>(
 
           {/* 取消按钮 */}
           <Pressable
-            className="mx-5 mt-5 items-center rounded-xl bg-gray-100 py-3 active:bg-gray-200"
+            className="mx-5 mt-5 items-center rounded-xl bg-gray-100 dark:bg-gray-700 py-3 active:bg-gray-200 dark:active:bg-gray-600"
             onPress={() =>
               (ref as React.RefObject<BottomSheetModal>)?.current?.dismiss()
             }
           >
-            <Text className="text-sm font-medium text-gray-600">取消</Text>
+            <Text className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              取消
+            </Text>
           </Pressable>
         </BottomSheetView>
       </BottomSheetModal>

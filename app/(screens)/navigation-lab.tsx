@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { type Href, Stack, useRouter } from 'expo-router';
 import * as ExpoLinking from 'expo-linking';
 import { useCallback, useRef } from 'react';
-import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
 
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ShareSheet } from '../../src/components/ShareSheet';
@@ -61,27 +61,33 @@ function SectionCard({
   demo: DemoItem;
   onPress: () => void;
 }) {
+  const isDark = useColorScheme() === 'dark';
+
   return (
     <Pressable
-      className="mb-3 rounded-2xl bg-white p-4 active:bg-gray-50"
+      className="mb-3 rounded-2xl bg-white dark:bg-gray-800 p-4 active:bg-gray-50 dark:active:bg-gray-700"
       onPress={onPress}
     >
       <View className="flex-row items-center">
-        <View className="h-11 w-11 items-center justify-center rounded-xl bg-indigo-50">
-          <Ionicons name={demo.icon} size={22} color="#6366F1" />
+        <View className="h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950">
+          <Ionicons name={demo.icon} size={22} color={isDark ? '#818CF8' : '#6366F1'} />
         </View>
         <View className="ml-3 flex-1">
           <View className="flex-row items-center">
-            <Text className="text-base font-semibold text-gray-900">
+            <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
               {demo.title}
             </Text>
-            <View className="ml-2 rounded-full bg-indigo-50 px-2 py-0.5">
-              <Text className="text-xs text-indigo-500">{demo.category}</Text>
+            <View className="ml-2 rounded-full bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5">
+              <Text className="text-xs text-indigo-500 dark:text-indigo-400">
+                {demo.category}
+              </Text>
             </View>
           </View>
-          <Text className="mt-1 text-sm text-gray-500">{demo.description}</Text>
+          <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {demo.description}
+          </Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+        <Ionicons name="chevron-forward" size={18} color={isDark ? '#4B5563' : '#D1D5DB'} />
       </View>
     </Pressable>
   );
@@ -94,6 +100,7 @@ function SectionCard({
 export default function NavigationLabScreen() {
   const router = useRouter();
   const shareSheetRef = useRef<BottomSheetModal>(null);
+  const isDark = useColorScheme() === 'dark';
 
   const handleDeepLinkDemo = useCallback(() => {
     // createURL 根据运行环境自动生成正确格式的 URL：
@@ -147,7 +154,7 @@ export default function NavigationLabScreen() {
       <Stack.Screen options={{ title: '导航进阶' }} />
 
       <ScrollView
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-gray-50 dark:bg-gray-950"
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 12,
@@ -156,12 +163,12 @@ export default function NavigationLabScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* 导航架构图 */}
-        <View className="mb-4 rounded-2xl bg-white p-4">
-          <Text className="text-sm font-semibold text-gray-700 mb-3">
+        <View className="mb-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
             当前导航架构
           </Text>
-          <View className="rounded-xl bg-gray-50 p-3">
-            <Text className="text-xs font-mono text-gray-600 leading-5">
+          <View className="rounded-xl bg-gray-50 dark:bg-gray-700 p-3">
+            <Text className="text-xs font-mono text-gray-600 dark:text-gray-400 leading-5">
               {'Root Stack (app/_layout.tsx)\n'}
               {'├── (tabs)        → Tab 导航\n'}
               {'│   ├── index     → 首页 Feed\n'}
@@ -173,6 +180,7 @@ export default function NavigationLabScreen() {
               {'│   ├── post/[id] → 动态路由详情\n'}
               {'│   ├── create-post\n'}
               {'│   ├── media-lab\n'}
+              {'│   ├── theme-lab → 主题系统\n'}
               {'│   └── navigation-lab (当前)\n'}
               {'└── settings-modal → Modal 呈现'}
             </Text>
@@ -180,8 +188,8 @@ export default function NavigationLabScreen() {
         </View>
 
         {/* 参数传递方式对比 */}
-        <View className="mb-4 rounded-2xl bg-white p-4">
-          <Text className="text-sm font-semibold text-gray-700 mb-3">
+        <View className="mb-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
             页面传参方式对比
           </Text>
           {[
@@ -202,12 +210,14 @@ export default function NavigationLabScreen() {
             },
           ].map((item) => (
             <View key={item.method} className="mb-3 last:mb-0">
-              <Text className="text-sm font-medium text-indigo-600">
+              <Text className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                 {item.method}
               </Text>
-              <Text className="text-xs text-gray-500 mt-0.5">{item.desc}</Text>
-              <View className="mt-1 rounded-lg bg-gray-50 px-2.5 py-1.5">
-                <Text className="text-xs font-mono text-gray-600">
+              <Text className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {item.desc}
+              </Text>
+              <View className="mt-1 rounded-lg bg-gray-50 dark:bg-gray-700 px-2.5 py-1.5">
+                <Text className="text-xs font-mono text-gray-600 dark:text-gray-400">
                   {item.example}
                 </Text>
               </View>
@@ -216,7 +226,7 @@ export default function NavigationLabScreen() {
         </View>
 
         {/* Demo 列表 */}
-        <Text className="mb-2 mt-2 text-sm font-semibold text-gray-400 uppercase tracking-wider">
+        <Text className="mb-2 mt-2 text-sm font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
           交互演示
         </Text>
 

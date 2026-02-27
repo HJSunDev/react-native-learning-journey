@@ -48,6 +48,7 @@ export const secureStorage = {
 // 适用范围: 用户偏好设置、缓存数据等非敏感信息
 
 const USER_INFO_KEY = 'user_info';
+const THEME_MODE_KEY = 'theme_mode';
 
 export const storage = {
   async setUserInfo(info: User): Promise<void> {
@@ -73,6 +74,23 @@ export const storage = {
       await AsyncStorage.removeItem(USER_INFO_KEY);
     } catch (e) {
       console.error('Error clearing user info', e);
+    }
+  },
+
+  async getThemeMode(): Promise<string | null> {
+    try {
+      return await AsyncStorage.getItem(THEME_MODE_KEY);
+    } catch (e) {
+      console.error('Error getting theme mode', e);
+      return null;
+    }
+  },
+
+  async setThemeMode(mode: string): Promise<void> {
+    try {
+      await AsyncStorage.setItem(THEME_MODE_KEY, mode);
+    } catch (e) {
+      console.error('Error setting theme mode', e);
     }
   },
 };

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ScreenHeaderProps {
@@ -11,8 +11,6 @@ interface ScreenHeaderProps {
   showBack?: boolean;
   /** 右侧自定义内容 */
   headerRight?: ReactNode;
-  /** 背景色，默认 #f9fafb */
-  backgroundColor?: string;
 }
 
 const HEADER_HEIGHT = 56;
@@ -31,10 +29,10 @@ export function ScreenHeader({
   title,
   showBack = true,
   headerRight,
-  backgroundColor = '#f9fafb',
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const isDark = useColorScheme() === 'dark';
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -45,7 +43,18 @@ export function ScreenHeader({
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          backgroundColor: isDark ? '#030712' : '#f9fafb',
+          borderBottomColor: isDark
+            ? 'rgba(255, 255, 255, 0.06)'
+            : 'rgba(0, 0, 0, 0.08)',
+        },
+      ]}
+    >
       <View style={styles.content}>
         {/* 左侧区域 */}
         <View style={styles.left}>
@@ -55,17 +64,28 @@ export function ScreenHeader({
               hitSlop={12}
               style={({ pressed }) => [
                 styles.backButton,
-                pressed && styles.backButtonPressed,
+                pressed && {
+                  backgroundColor: isDark
+                    ? 'rgba(255, 255, 255, 0.10)'
+                    : 'rgba(55, 65, 81, 0.12)',
+                },
               ]}
             >
-              <Ionicons name="chevron-back" size={22} color="#111827" />
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={isDark ? '#F3F4F6' : '#111827'}
+              />
             </Pressable>
           )}
         </View>
 
         {/* 标题 */}
         <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text
+            style={[styles.title, { color: isDark ? '#F3F4F6' : '#111827' }]}
+            numberOfLines={1}
+          >
             {title}
           </Text>
         </View>
@@ -80,7 +100,6 @@ export function ScreenHeader({
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(0, 0, 0, 0.08)',
   },
   content: {
     height: HEADER_HEIGHT,
@@ -99,7 +118,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
   },
   right: {
     width: 48,
@@ -111,8 +129,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backButtonPressed: {
-    backgroundColor: 'rgba(55, 65, 81, 0.12)',
   },
 });

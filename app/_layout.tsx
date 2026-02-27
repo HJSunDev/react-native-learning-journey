@@ -2,11 +2,13 @@ import "../global.css";
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
 import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Appearance, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '../src/stores/authStore';
+import { useThemeStore } from '../src/stores/themeStore';
 
 /**
  * 认证守卫（单向门禁模式）：
@@ -15,6 +17,8 @@ import { useAuthStore } from '../src/stores/authStore';
  */
 function AuthGuard() {
   const { token, isLoading } = useAuthStore();
+  const themeLoading = useThemeStore((s) => s.isLoading);
+  const colorScheme = useColorScheme();
   const segments = useSegments();
   const router = useRouter();
 
@@ -30,17 +34,30 @@ function AuthGuard() {
     }
   }, [token, isLoading, segments, router]);
 
-  // 应用启动时从持久化存储恢复登录态，期间显示加载指示器
-  if (isLoading) {
+  if (isLoading || themeLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colorScheme === 'dark' ? '#030712' : '#ffffff',
+        }}
+      >
         <ActivityIndicator size="large" color="#6366F1" />
       </View>
     );
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#030712' : '#f9fafb',
+        },
+      }}
+    >
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(screens)" />
@@ -57,6 +74,9 @@ function AuthGuard() {
 
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
+  const hydrateTheme = useThemeStore((s) => s.hydrate);
+  const themeMode = useThemeStore((s) => s.mode);
+  const colorScheme = useColorScheme();
 
   // 确保 QueryClient 单例，防止重渲染时丢失缓存
   const [queryClient] = useState(() => new QueryClient({
@@ -71,10 +91,18 @@ export default function RootLayout() {
   // 应用挂载时执行一次 hydrate，从本地存储恢复登录态
   useEffect(() => {
     hydrate();
-  }, [hydrate]);
+    hydrateTheme();
+  }, [hydrate, hydrateTheme]);
+
+  // 将持久化的主题偏好同步到 React Native Appearance API，
+  // NativeWind 的 dark: 前缀类会自动响应
+  useEffect(() => {
+    Appearance.setColorScheme(themeMode === 'system' ? null : themeMode);
+  }, [themeMode]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <QueryClientProvider client={queryClient}>
         <BottomSheetModalProvider>
           <AuthGuard />

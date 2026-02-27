@@ -1,13 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useColorScheme } from "react-native";
 import AnimatedTabBar from "../../src/components/AnimatedTabBar";
 
 export default function TabsLayout() {
+  const isDark = useColorScheme() === 'dark';
+
   return (
     <Tabs
       tabBar={(props) => <AnimatedTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: "#6366F1",
+        headerStyle: {
+          backgroundColor: isDark ? '#030712' : '#f9fafb',
+        },
+        headerTintColor: isDark ? '#F3F4F6' : '#111827',
+        headerShadowVisible: false,
       }}
     >
       <Tabs.Screen

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, useColorScheme, View } from 'react-native';
 import type { Post } from '../features/feed';
 import { formatRelativeTime } from '../utils/format';
 
@@ -16,9 +16,11 @@ interface PostCardProps {
  * 当 Cell 被回收并绑定新数据时，旧状态会泄漏到新 Item 上。
  */
 export function PostCard({ post, onPress }: PostCardProps) {
+  const isDark = useColorScheme() === 'dark';
+
   return (
     <Pressable
-      className="mx-4 mb-4 overflow-hidden rounded-2xl bg-white"
+      className="mx-4 mb-4 overflow-hidden rounded-2xl bg-white dark:bg-gray-800"
       onPress={() => onPress?.(post)}
     >
       {/* 封面图：recyclingKey 确保 Cell 复用时图片正确切换 */}
@@ -34,17 +36,28 @@ export function PostCard({ post, onPress }: PostCardProps) {
         {/* 标签 */}
         <View className="flex-row flex-wrap gap-1.5 mb-2">
           {post.tags.map((tag) => (
-            <View key={tag} className="rounded-full bg-indigo-50 px-2.5 py-0.5">
-              <Text className="text-xs text-indigo-600">{tag}</Text>
+            <View
+              key={tag}
+              className="rounded-full bg-indigo-50 dark:bg-indigo-950 px-2.5 py-0.5"
+            >
+              <Text className="text-xs text-indigo-600 dark:text-indigo-400">
+                {tag}
+              </Text>
             </View>
           ))}
         </View>
 
-        <Text className="text-base font-bold text-gray-900" numberOfLines={2}>
+        <Text
+          className="text-base font-bold text-gray-900 dark:text-gray-100"
+          numberOfLines={2}
+        >
           {post.title}
         </Text>
 
-        <Text className="mt-1.5 text-sm text-gray-500" numberOfLines={2}>
+        <Text
+          className="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+          numberOfLines={2}
+        >
           {post.summary}
         </Text>
 
@@ -52,25 +65,41 @@ export function PostCard({ post, onPress }: PostCardProps) {
         <View className="flex-row items-center mt-3">
           <Image
             source={post.author.avatar}
-            className="w-6 h-6 rounded-full bg-gray-100"
+            className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700"
             contentFit="cover"
             recyclingKey={post.author.id}
           />
-          <Text className="ml-2 text-xs text-gray-600">{post.author.name}</Text>
-          <Text className="mx-1.5 text-xs text-gray-300">·</Text>
-          <Text className="text-xs text-gray-400">
+          <Text className="ml-2 text-xs text-gray-600 dark:text-gray-400">
+            {post.author.name}
+          </Text>
+          <Text className="mx-1.5 text-xs text-gray-300 dark:text-gray-600">
+            ·
+          </Text>
+          <Text className="text-xs text-gray-400 dark:text-gray-500">
             {formatRelativeTime(post.createdAt)}
           </Text>
 
           <View className="flex-1" />
 
           <View className="flex-row items-center">
-            <Ionicons name="heart-outline" size={14} color="#9CA3AF" />
-            <Text className="ml-1 text-xs text-gray-400">{post.likes}</Text>
+            <Ionicons
+              name="heart-outline"
+              size={14}
+              color={isDark ? '#6B7280' : '#9CA3AF'}
+            />
+            <Text className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+              {post.likes}
+            </Text>
           </View>
           <View className="flex-row items-center ml-3">
-            <Ionicons name="chatbubble-outline" size={13} color="#9CA3AF" />
-            <Text className="ml-1 text-xs text-gray-400">{post.comments}</Text>
+            <Ionicons
+              name="chatbubble-outline"
+              size={13}
+              color={isDark ? '#6B7280' : '#9CA3AF'}
+            />
+            <Text className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+              {post.comments}
+            </Text>
           </View>
         </View>
       </View>

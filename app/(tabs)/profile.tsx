@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../src/stores/authStore";
 
@@ -16,21 +16,27 @@ interface MenuItem {
  * 抽取为独立组件，避免在两个条件分支中重复渲染逻辑。
  */
 function MenuSection({ items }: { items: MenuItem[] }) {
+  const isDark = useColorScheme() === 'dark';
+
   return (
-    <View className="mx-5 overflow-hidden rounded-2xl bg-white">
+    <View className="mx-5 overflow-hidden rounded-2xl bg-white dark:bg-gray-800">
       {items.map((item, index) => (
         <Pressable
           key={item.label}
-          className={`flex-row items-center px-4 py-4 active:bg-gray-50 ${
-            index < items.length - 1 ? "border-b border-gray-100" : ""
+          className={`flex-row items-center px-4 py-4 active:bg-gray-50 dark:active:bg-gray-700 ${
+            index < items.length - 1
+              ? "border-b border-gray-100 dark:border-gray-700"
+              : ""
           }`}
           onPress={item.onPress}
         >
-          <View className="mr-3 h-9 w-9 items-center justify-center rounded-xl bg-indigo-50">
-            <Ionicons name={item.icon} size={20} color="#6366F1" />
+          <View className="mr-3 h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950">
+            <Ionicons name={item.icon} size={20} color={isDark ? '#818CF8' : '#6366F1'} />
           </View>
-          <Text className="flex-1 text-base text-gray-800">{item.label}</Text>
-          <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+          <Text className="flex-1 text-base text-gray-800 dark:text-gray-200">
+            {item.label}
+          </Text>
+          <Ionicons name="chevron-forward" size={18} color={isDark ? '#4B5563' : '#D1D5DB'} />
         </Pressable>
       ))}
     </View>
@@ -47,16 +53,16 @@ function GuestView() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
       {/* 头部引导区域 */}
       <View className="items-center px-8 pb-8 pt-12">
-        <View className="mb-5 h-24 w-24 items-center justify-center rounded-full bg-gray-200">
+        <View className="mb-5 h-24 w-24 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
           <Ionicons name="person-outline" size={48} color="#9CA3AF" />
         </View>
-        <Text className="text-xl font-bold text-gray-800">
+        <Text className="text-xl font-bold text-gray-800 dark:text-gray-200">
           登录后体验更多功能
         </Text>
-        <Text className="mt-2 text-sm text-gray-400">
+        <Text className="mt-2 text-sm text-gray-400 dark:text-gray-500">
           收藏、历史记录、个性化推荐…
         </Text>
 
@@ -102,18 +108,18 @@ function AuthenticatedView() {
   const avatarLetter = user?.username?.charAt(0)?.toUpperCase() ?? "U";
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-950">
       {/* 用户信息卡片 */}
       <View className="items-center px-8 pb-8 pt-12">
-        <View className="mb-4 h-24 w-24 items-center justify-center rounded-full bg-indigo-100">
-          <Text className="text-3xl font-bold text-indigo-600">
+        <View className="mb-4 h-24 w-24 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-950">
+          <Text className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
             {avatarLetter}
           </Text>
         </View>
-        <Text className="text-xl font-bold text-gray-800">
+        <Text className="text-xl font-bold text-gray-800 dark:text-gray-200">
           {user?.username ?? "用户"}
         </Text>
-        <Text className="mt-1 text-sm text-gray-400">
+        <Text className="mt-1 text-sm text-gray-400 dark:text-gray-500">
           ID: {user?.id ?? "-"}
         </Text>
       </View>
@@ -123,7 +129,7 @@ function AuthenticatedView() {
 
       {/* 退出登录 */}
       <Pressable
-        className="mx-5 mt-6 items-center rounded-2xl bg-white py-4 active:bg-gray-50"
+        className="mx-5 mt-6 items-center rounded-2xl bg-white dark:bg-gray-800 py-4 active:bg-gray-50 dark:active:bg-gray-700"
         onPress={handleLogout}
       >
         <Text className="text-base font-medium text-red-500">退出登录</Text>
@@ -135,9 +141,16 @@ function AuthenticatedView() {
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const token = useAuthStore((s) => s.token);
+  const isDark = useColorScheme() === 'dark';
 
   return (
-    <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: "#f9fafb" }}>
+    <View
+      style={{
+        flex: 1,
+        paddingTop: insets.top,
+        backgroundColor: isDark ? '#030712' : '#f9fafb',
+      }}
+    >
       {token ? <AuthenticatedView /> : <GuestView />}
     </View>
   );

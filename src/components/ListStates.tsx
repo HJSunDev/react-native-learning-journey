@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, useColorScheme, View } from 'react-native';
 
 // ─── 空状态 ───
 
@@ -12,10 +12,14 @@ export function ListEmpty({
   icon = 'document-text-outline',
   message = '暂无内容',
 }: ListEmptyProps) {
+  const isDark = useColorScheme() === 'dark';
+
   return (
     <View className="items-center justify-center py-20">
-      <Ionicons name={icon} size={48} color="#D1D5DB" />
-      <Text className="mt-4 text-base text-gray-400">{message}</Text>
+      <Ionicons name={icon} size={48} color={isDark ? '#4B5563' : '#D1D5DB'} />
+      <Text className="mt-4 text-base text-gray-400 dark:text-gray-500">
+        {message}
+      </Text>
     </View>
   );
 }
@@ -34,7 +38,9 @@ export function ListError({
   return (
     <View className="flex-1 items-center justify-center py-20">
       <Ionicons name="cloud-offline-outline" size={48} color="#F87171" />
-      <Text className="mt-4 text-base text-gray-500">{message}</Text>
+      <Text className="mt-4 text-base text-gray-500 dark:text-gray-400">
+        {message}
+      </Text>
       {onRetry && (
         <Pressable
           className="mt-4 rounded-xl bg-indigo-600 px-6 py-2.5 active:bg-indigo-700"
@@ -66,7 +72,9 @@ export function ListFooter({ isLoading, hasMore }: ListFooterProps) {
   if (!hasMore) {
     return (
       <View className="items-center py-6">
-        <Text className="text-sm text-gray-300">— 已经到底了 —</Text>
+        <Text className="text-sm text-gray-300 dark:text-gray-600">
+          — 已经到底了 —
+        </Text>
       </View>
     );
   }
@@ -78,7 +86,7 @@ export function ListFooter({ isLoading, hasMore }: ListFooterProps) {
 
 export function ListLoading() {
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-950">
       <ActivityIndicator size="large" color="#6366F1" />
     </View>
   );
