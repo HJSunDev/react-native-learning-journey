@@ -40,6 +40,7 @@ const DEMO_SECTIONS: DemoSection[] = [
     description: 'Modal、Bottom Sheet、Deep Linking',
     icon: 'navigate-outline',
     tags: ['expo-router', 'Bottom Sheet'],
+    route: '/navigation-lab' as Href,
   },
   {
     id: 'theming',

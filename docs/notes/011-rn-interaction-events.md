@@ -542,7 +542,7 @@ export default function RootLayout() {
 }
 ```
 
-> Expo Router v3+ 已自动包裹 `GestureHandlerRootView`，无需手动添加。但如果遇到手势不生效的问题，先检查这一层。
+> ⚠️ Expo Router 在 Web 端可能自动提供 `GestureHandlerRootView`，但 **iOS/Android 原生端不会自动包裹**。必须在 `app/_layout.tsx` 中手动添加，否则所有 `GestureDetector` 和依赖手势的第三方库（如 `@gorhom/bottom-sheet`）会在原生端报错。详见 [015. 导航进阶](015-advanced-navigation.md) 中的 GestureHandlerRootView 原理说明。
 
 #### E2. 手势类型一览
 

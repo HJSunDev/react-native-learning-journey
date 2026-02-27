@@ -1,9 +1,11 @@
 import "../global.css";
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useAuthStore } from '../src/stores/authStore';
 
 /**
@@ -42,6 +44,13 @@ function AuthGuard() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(screens)" />
+      <Stack.Screen
+        name="settings-modal"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
@@ -65,8 +74,12 @@ export default function RootLayout() {
   }, [hydrate]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthGuard />
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <BottomSheetModalProvider>
+          <AuthGuard />
+        </BottomSheetModalProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

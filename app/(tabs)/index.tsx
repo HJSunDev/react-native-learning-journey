@@ -1,4 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
+import { type Href, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import {
@@ -12,6 +13,7 @@ import type { Post } from '../../src/features/feed';
 import { useFeed } from '../../src/features/feed';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const {
     data,
     isLoading,
@@ -27,9 +29,18 @@ export default function HomeScreen() {
   // flatMap 将多页数据拍平为一维数组
   const posts = data?.pages.flatMap((page) => page.data) ?? [];
 
+  const handlePostPress = useCallback(
+    (post: Post) => {
+      router.push(`/(screens)/post/${post.id}` as Href);
+    },
+    [router],
+  );
+
   const renderItem = useCallback(
-    ({ item }: { item: Post }) => <PostCard post={item} />,
-    [],
+    ({ item }: { item: Post }) => (
+      <PostCard post={item} onPress={handlePostPress} />
+    ),
+    [handlePostPress],
   );
 
   const handleEndReached = useCallback(() => {

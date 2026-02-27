@@ -44,8 +44,8 @@
   - react-hook-form + Zod v4 校验集成、自定义 zodResolver、可复用表单控件 (FormInput/FormTextArea/FormSelect/FormTagSelect)、焦点跳转与键盘管理、Explore Tab 演示中心架构、Slot vs Stack 导航模式、Route Group 路由组、Stack.Screen 多层级架构
 - **[014. 图片与媒体](notes/014-image-and-media.md)**
   - expo-image 高性能展示 (缓存/blurhash/contentFit)、expo-image-picker (相册/拍照/多选)、expo-image-manipulator 链式处理 (压缩/缩放)、上传流程 (FormData + 进度)、FormImagePicker 表单集成
-- 🔲 **015. 导航进阶**
-  - Modal/Bottom Sheet、Drawer 导航、Deep Linking (URL Scheme + Universal Links)、动态路由 `[id].tsx`、页面传参方式对比
+- **[015. 导航进阶](notes/015-advanced-navigation.md)**
+  - Modal 呈现模式 (presentation: 'modal')、@gorhom/bottom-sheet 手势面板、动态路由 [id].tsx (useLocalSearchParams)、Deep Linking (URL Scheme)、页面传参方式对比
 - 🔲 **016. 暗色模式与主题系统**
   - useColorScheme + NativeWind dark: 实战、主题切换 (跟随系统/手动/持久化)、状态栏与导航栏联动、Design Token 驱动主题架构
 
