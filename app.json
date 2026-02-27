@@ -28,6 +28,18 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "允许 rn-journey 使用相机拍照和扫描二维码"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "允许 rn-journey 获取您的位置信息"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "允许 rn-journey 访问相册以选择图片",

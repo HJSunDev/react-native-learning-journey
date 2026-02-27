@@ -53,8 +53,8 @@
 
 > 让 App 具备原生质感，调用设备硬件与系统能力。
 
-- 🔲 **017. 权限与设备 API**
-  - 权限请求统一模式、expo-camera (扫码/拍照)、expo-location (前台/后台定位)、expo-file-system、Share API、Clipboard
+- **[017. 权限与设备 API](notes/017-permissions-and-device-api.md)**
+  - usePermission 统一权限 Hook (Adapter Pattern)、expo-camera (拍照/二维码扫描)、expo-location (GPS + 反向地理编码)、expo-clipboard、Share API、权限生命周期与平台差异
 - 🔲 **018. 推送通知**
   - expo-notifications 本地通知、远程推送 (Push Token 注册/服务端流程)、通知点击导航、权限请求 UX
 - 🔲 **019. 生物认证与安全**

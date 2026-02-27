@@ -1,9 +1,9 @@
 ---
-description: React Native 跨平台样式/渲染陷阱，涉及 NativeWind className/style、TextInput、iOS 26 导航栏等场景时必须遵守
+description: React Native 跨平台样式/渲染陷阱和 Expo 模块导出陷阱，涉及 NativeWind className/style、TextInput、iOS 26 导航栏、expo-camera 等场景时必须遵守
 alwaysApply: true
 ---
 
-# React Native 平台样式陷阱
+# React Native 平台陷阱
 
 ## 1. 禁止在同一元素上混用 style 和 className
 
@@ -80,3 +80,20 @@ screenOptions={{
 ```
 
 此方案的代价是失去原生 Header 的推入/弹出动画（Header 会随整个页面一起过渡），对绝大多数业务场景可接受。
+
+## 5. expo-camera 权限函数不是模块顶级导出
+
+`expo-camera` 的 `getCameraPermissionsAsync` / `requestCameraPermissionsAsync` 是模块内部局部函数，
+只通过 `export const Camera = { ... }` 对象暴露。`import * as Cam from 'expo-camera'` 后 `Cam.getCameraPermissionsAsync` 是 `undefined`。
+
+```tsx
+// ❌ getCameraPermissionsAsync 不是模块顶级导出，运行时 undefined
+import * as Camera from 'expo-camera';
+Camera.getCameraPermissionsAsync();
+
+// ✅ 从命名导出的 Camera 对象上访问
+import { Camera } from 'expo-camera';
+Camera.getCameraPermissionsAsync();
+```
+
+此陷阱仅限 `expo-camera`。`expo-location` 等模块的权限函数是正常的顶级导出。

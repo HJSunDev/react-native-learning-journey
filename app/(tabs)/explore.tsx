@@ -50,6 +50,14 @@ const DEMO_SECTIONS: DemoSection[] = [
     tags: ['NativeWind', 'useColorScheme'],
     route: '/theme-lab' as Href,
   },
+  {
+    id: 'device',
+    title: '权限与设备 API',
+    description: '相机、定位、剪贴板、系统分享',
+    icon: 'hardware-chip-outline',
+    tags: ['expo-camera', 'expo-location', 'Permissions'],
+    route: '/device-lab' as Href,
+  },
 ];
 
 function DemoCard({ section }: { section: DemoSection }) {
