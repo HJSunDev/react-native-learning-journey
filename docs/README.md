@@ -55,8 +55,8 @@
 
 - **[017. 权限与设备 API](notes/017-permissions-and-device-api.md)**
   - usePermission 统一权限 Hook (Adapter Pattern)、expo-camera (拍照/二维码扫描)、expo-location (GPS + 反向地理编码)、expo-clipboard、Share API、权限生命周期与平台差异
-- 🔲 **018. 推送通知**
-  - expo-notifications 本地通知、远程推送 (Push Token 注册/服务端流程)、通知点击导航、权限请求 UX
+- **[018. 推送通知](notes/018-push-notifications.md)**
+  - expo-notifications 本地通知调度、Push Token 获取、通知点击导航 (冷启动/热启动)、Android Channel、角标管理、事件监听
 - 🔲 **019. 生物认证与安全**
   - expo-local-authentication (指纹/Face ID)、与 SecureStore 配合的安全架构、App Lock 模式
 

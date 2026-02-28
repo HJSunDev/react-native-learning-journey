@@ -97,3 +97,19 @@ Camera.getCameraPermissionsAsync();
 ```
 
 此陷阱仅限 `expo-camera`。`expo-location` 等模块的权限函数是正常的顶级导出。
+
+## 6. TextInput 禁止使用 text-center / text-right 等 textAlign 类
+
+NativeWind v5 preview 的 `nativeStyleMapping` 对 TextInput 组件处理 `text-align` CSS 属性时，
+内部 path 变量为 `undefined`，导致 `path.split is not a function` 崩溃。
+此 bug 仅影响 TextInput 组件，Text 组件使用 `text-center` 不受影响。
+
+```tsx
+// ❌ iOS 崩溃：path.split is not a function
+<TextInput className="text-center text-[14px]" />
+
+// ✅ 用 style-only 容器包裹控制对齐，TextInput 仅用 className
+<View style={{ alignItems: 'center' }}>
+  <TextInput className="text-[14px]" />
+</View>
+```

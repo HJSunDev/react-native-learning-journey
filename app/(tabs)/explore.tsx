@@ -58,6 +58,14 @@ const DEMO_SECTIONS: DemoSection[] = [
     tags: ['expo-camera', 'expo-location', 'Permissions'],
     route: '/device-lab' as Href,
   },
+  {
+    id: 'notifications',
+    title: '推送通知',
+    description: '本地通知调度、Push Token、角标管理',
+    icon: 'notifications-outline',
+    tags: ['expo-notifications', 'Push Token', 'Badge'],
+    route: '/notification-lab' as Href,
+  },
 ];
 
 function DemoCard({ section }: { section: DemoSection }) {
