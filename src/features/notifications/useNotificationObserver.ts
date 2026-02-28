@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 /**
  * 通知点击 → 页面导航 Hook。
@@ -14,6 +15,8 @@ import { useEffect } from 'react';
  */
 export function useNotificationObserver() {
   useEffect(() => {
+    // expo-notifications 的核心 API 不支持 Web 平台
+    if (Platform.OS === 'web') return;
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.url;
       if (typeof url === 'string') {

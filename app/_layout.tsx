@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Appearance,
+  Platform,
   useColorScheme,
   View,
 } from "react-native";
@@ -124,7 +125,10 @@ export default function RootLayout() {
   // 将持久化的主题偏好同步到 React Native Appearance API，
   // NativeWind 的 dark: 前缀类会自动响应
   useEffect(() => {
-    Appearance.setColorScheme(themeMode === "system" ? null : themeMode);
+    // Appearance.setColorScheme 是原生专属 API，Web 端不可用
+    if (Platform.OS !== "web") {
+      Appearance.setColorScheme(themeMode === "system" ? null : themeMode);
+    }
   }, [themeMode]);
 
   return (
