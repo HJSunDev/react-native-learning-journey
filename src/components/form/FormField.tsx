@@ -15,7 +15,7 @@ export function FormField({ label, error, required, children }: FormFieldProps) 
   return (
     <View className="gap-1.5">
       <View className="flex-row items-center">
-        <Text className="text-sm font-medium text-gray-700">{label}</Text>
+        <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</Text>
         {required && <Text className="ml-0.5 text-red-500">*</Text>}
       </View>
       {children}

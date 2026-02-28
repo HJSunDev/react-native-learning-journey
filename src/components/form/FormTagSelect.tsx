@@ -68,14 +68,14 @@ export function FormTagSelect<T extends FieldValues>({
                     className={`rounded-full border px-4 py-2 ${
                       isSelected
                         ? 'border-indigo-600 bg-indigo-600'
-                        : 'border-gray-200 bg-white active:bg-gray-50'
+                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 active:bg-gray-50 dark:active:bg-gray-700'
                     }`}
                   >
                     <Text
                       className={`text-sm ${
                         isSelected
                           ? 'font-medium text-white'
-                          : 'text-gray-600'
+                          : 'text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       {tag}

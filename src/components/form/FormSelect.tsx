@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { FlatList, Modal, Pressable, Text, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FormField } from './FormField';
 
@@ -35,6 +35,7 @@ export function FormSelect<T extends FieldValues>({
 }: FormSelectProps<T>) {
   const [visible, setVisible] = useState(false);
   const insets = useSafeAreaInsets();
+  const isDark = useColorScheme() === 'dark';
 
   return (
     <Controller
@@ -46,17 +47,19 @@ export function FormSelect<T extends FieldValues>({
         return (
           <FormField label={label} error={error?.message} required={required}>
             <Pressable
-              className="h-12 flex-row items-center rounded-2xl border border-gray-200 bg-white px-4"
+              className="h-12 flex-row items-center rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4"
               onPress={() => setVisible(true)}
             >
               <Text
                 className={`flex-1 text-[16px] ${
-                  selectedOption ? 'text-gray-900' : 'text-gray-300'
+                  selectedOption
+                    ? 'text-gray-900 dark:text-gray-100'
+                    : 'text-gray-300 dark:text-gray-500'
                 }`}
               >
                 {selectedOption?.label ?? placeholder}
               </Text>
-              <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
+              <Ionicons name="chevron-down" size={18} color={isDark ? '#6B7280' : '#9CA3AF'} />
             </Pressable>
 
             <Modal
@@ -65,8 +68,6 @@ export function FormSelect<T extends FieldValues>({
               animationType="fade"
               onRequestClose={() => setVisible(false)}
             >
-              {/* 遮罩 + 底部面板共同组成 Modal 内容 */}
-              {/* animationType="fade" 让遮罩瞬间覆盖全屏；"slide" 会让遮罩从底部升起，露出下层页面 */}
               <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
                 <Pressable
                   style={{ flex: 1 }}
@@ -74,15 +75,20 @@ export function FormSelect<T extends FieldValues>({
                 />
 
                 <View
-                  style={{ paddingBottom: insets.bottom, backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+                  style={{
+                    paddingBottom: insets.bottom,
+                    backgroundColor: isDark ? '#1F2937' : '#fff',
+                    borderTopLeftRadius: 24,
+                    borderTopRightRadius: 24,
+                  }}
                 >
                 {/* 标题栏 */}
-                <View className="flex-row items-center justify-between border-b border-gray-100 px-5 py-4">
-                  <Text className="text-lg font-semibold text-gray-900">
+                <View className="flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700 px-5 py-4">
+                  <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {label}
                   </Text>
                   <Pressable onPress={() => setVisible(false)}>
-                    <Ionicons name="close" size={24} color="#9CA3AF" />
+                    <Ionicons name="close" size={24} color={isDark ? '#6B7280' : '#9CA3AF'} />
                   </Pressable>
                 </View>
 
@@ -96,7 +102,9 @@ export function FormSelect<T extends FieldValues>({
                     return (
                       <Pressable
                         className={`flex-row items-center px-5 py-4 ${
-                          isSelected ? 'bg-indigo-50' : 'active:bg-gray-50'
+                          isSelected
+                            ? 'bg-indigo-50 dark:bg-indigo-950'
+                            : 'active:bg-gray-50 dark:active:bg-gray-700'
                         }`}
                         onPress={() => {
                           onChange(item.value);
@@ -106,8 +114,8 @@ export function FormSelect<T extends FieldValues>({
                         <Text
                           className={`flex-1 text-base ${
                             isSelected
-                              ? 'font-medium text-indigo-600'
-                              : 'text-gray-800'
+                              ? 'font-medium text-indigo-600 dark:text-indigo-400'
+                              : 'text-gray-800 dark:text-gray-200'
                           }`}
                         >
                           {item.label}
@@ -116,7 +124,7 @@ export function FormSelect<T extends FieldValues>({
                           <Ionicons
                             name="checkmark"
                             size={20}
-                            color="#6366F1"
+                            color={isDark ? '#818CF8' : '#6366F1'}
                           />
                         )}
                       </Pressable>
