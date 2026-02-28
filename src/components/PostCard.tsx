@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Pressable, Text, useColorScheme, View } from 'react-native';
 import type { Post } from '../features/feed';
 import { formatRelativeTime } from '../utils/format';
+import { ExpoImage } from './ExpoImage';
 
 interface PostCardProps {
   post: Post;
@@ -24,7 +24,7 @@ export function PostCard({ post, onPress }: PostCardProps) {
       onPress={() => onPress?.(post)}
     >
       {/* 封面图：recyclingKey 确保 Cell 复用时图片正确切换 */}
-      <Image
+      <ExpoImage
         source={post.coverImage}
         className="w-full aspect-video"
         contentFit="cover"
@@ -63,7 +63,7 @@ export function PostCard({ post, onPress }: PostCardProps) {
 
         {/* 作者信息 & 互动数据 */}
         <View className="flex-row items-center mt-3">
-          <Image
+          <ExpoImage
             source={post.author.avatar}
             className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700"
             contentFit="cover"

@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef } from 'react';
 import { Pressable, ScrollView, Text, useColorScheme, View } from 'react-native';
+import { ExpoImage } from '../../../src/components/ExpoImage';
 
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { ShareSheet } from '../../../src/components/ShareSheet';
@@ -60,7 +60,7 @@ export default function PostDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* 封面图 */}
-        <Image
+        <ExpoImage
           source={post.coverImage}
           className="w-full aspect-video"
           contentFit="cover"
@@ -89,7 +89,7 @@ export default function PostDetailScreen() {
 
           {/* 作者信息栏 */}
           <View className="flex-row items-center mt-4 pb-4 border-b border-gray-100 dark:border-gray-700">
-            <Image
+            <ExpoImage
               source={post.author.avatar}
               className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700"
               contentFit="cover"

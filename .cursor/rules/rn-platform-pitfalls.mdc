@@ -1,5 +1,5 @@
 ---
-description: React Native 跨平台样式/渲染陷阱和 Expo 模块导出陷阱，涉及 NativeWind className/style、TextInput、iOS 26 导航栏、expo-camera 等场景时必须遵守
+description: React Native 跨平台样式/渲染陷阱和 Expo 模块导出陷阱，涉及 NativeWind className/style、TextInput、iOS 26 导航栏、expo-camera、expo-image 等场景时必须遵守
 alwaysApply: true
 ---
 
@@ -98,7 +98,29 @@ Camera.getCameraPermissionsAsync();
 
 此陷阱仅限 `expo-camera`。`expo-location` 等模块的权限函数是正常的顶级导出。
 
-## 6. TextInput 禁止使用 text-center / text-right 等 textAlign 类
+## 6. expo-image 的 Image 禁止直接使用 className 设定尺寸
+
+react-native-css（NativeWind v5 runtime）通过 Metro resolver 将 `import { View } from 'react-native'`
+拦截并替换为支持 className 的增强组件。`expo-image` 不在拦截范围内，
+其 Image 在原生端会忽略 className（Web 端正常），导致图片 0×0 不可见。
+
+```tsx
+// ❌ 原生端 className 被忽略，图片 0×0 不可见
+import { Image } from 'expo-image';
+<Image source={url} className="w-full aspect-video" contentFit="cover" />
+
+// ✅ 方案 A：使用 ExpoImage 包装组件（View 承载 className，expo-image 填充容器）
+import { ExpoImage } from '@/src/components/ExpoImage';
+<ExpoImage source={url} className="w-full aspect-video" contentFit="cover" />
+
+// ✅ 方案 B：用 style 直接指定尺寸（适用于无需 className 的场景）
+import { Image } from 'expo-image';
+<Image source={url} style={{ width: '100%', aspectRatio: 16/9 }} contentFit="cover" />
+```
+
+此陷阱仅影响 expo-image。从 `react-native` 导入的内置 Image 组件已被 react-native-css 替换，className 正常。
+
+## 7. TextInput 禁止使用 text-center / text-right 等 textAlign 类
 
 NativeWind v5 preview 的 `nativeStyleMapping` 对 TextInput 组件处理 `text-align` CSS 属性时，
 内部 path 变量为 `undefined`，导致 `path.split is not a function` 崩溃。
