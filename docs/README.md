@@ -57,8 +57,8 @@
   - usePermission 统一权限 Hook (Adapter Pattern)、expo-camera (拍照/二维码扫描)、expo-location (GPS + 反向地理编码)、expo-clipboard、Share API、权限生命周期与平台差异
 - **[018. 推送通知](notes/018-push-notifications.md)**
   - expo-notifications 本地通知调度、Push Token 获取、通知点击导航 (冷启动/热启动)、Android Channel、角标管理、事件监听
-- 🔲 **019. 生物认证与安全**
-  - expo-local-authentication (指纹/Face ID)、与 SecureStore 配合的安全架构、App Lock 模式
+- **[019. 生物认证与安全](notes/019-biometric-auth-and-security.md)**
+  - expo-local-authentication (指纹/Face ID/虹膜)、authenticateAsync 选项与错误处理、Zustand + AppState 驱动的 App Lock、安全存储分层架构
 
 ## ✨ 阶段五：体验与性能打磨
 

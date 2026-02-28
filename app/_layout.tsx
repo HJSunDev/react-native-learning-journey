@@ -13,8 +13,10 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BiometricLockScreen } from "../src/components/BiometricLockScreen";
 import { useNotificationObserver } from "../src/features/notifications";
 import { useAuthStore } from "../src/stores/authStore";
+import { useBiometricStore } from "../src/stores/biometricStore";
 import { useThemeStore } from "../src/stores/themeStore";
 
 // App 在前台时收到通知的展示策略（模块级调用，仅执行一次）
@@ -92,6 +94,7 @@ function AuthGuard() {
 export default function RootLayout() {
   const hydrate = useAuthStore((s) => s.hydrate);
   const hydrateTheme = useThemeStore((s) => s.hydrate);
+  const hydrateBiometric = useBiometricStore((s) => s.hydrate);
   const themeMode = useThemeStore((s) => s.mode);
   const colorScheme = useColorScheme();
 
@@ -111,11 +114,12 @@ export default function RootLayout() {
   // 通知点击 → 页面导航
   useNotificationObserver();
 
-  // 应用挂载时执行一次 hydrate，从本地存储恢复登录态
+  // 应用挂载时执行一次 hydrate，从本地存储恢复登录态和偏好
   useEffect(() => {
     hydrate();
     hydrateTheme();
-  }, [hydrate, hydrateTheme]);
+    hydrateBiometric();
+  }, [hydrate, hydrateTheme, hydrateBiometric]);
 
   // 将持久化的主题偏好同步到 React Native Appearance API，
   // NativeWind 的 dark: 前缀类会自动响应
@@ -129,6 +133,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <BottomSheetModalProvider>
           <AuthGuard />
+          <BiometricLockScreen />
         </BottomSheetModalProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

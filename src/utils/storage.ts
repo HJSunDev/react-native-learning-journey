@@ -49,6 +49,7 @@ export const secureStorage = {
 
 const USER_INFO_KEY = 'user_info';
 const THEME_MODE_KEY = 'theme_mode';
+const BIOMETRIC_ENABLED_KEY = 'biometric_enabled';
 
 export const storage = {
   async setUserInfo(info: User): Promise<void> {
@@ -91,6 +92,24 @@ export const storage = {
       await AsyncStorage.setItem(THEME_MODE_KEY, mode);
     } catch (e) {
       console.error('Error setting theme mode', e);
+    }
+  },
+
+  async getBiometricEnabled(): Promise<boolean> {
+    try {
+      const value = await AsyncStorage.getItem(BIOMETRIC_ENABLED_KEY);
+      return value === 'true';
+    } catch (e) {
+      console.error('Error getting biometric preference', e);
+      return false;
+    }
+  },
+
+  async setBiometricEnabled(enabled: boolean): Promise<void> {
+    try {
+      await AsyncStorage.setItem(BIOMETRIC_ENABLED_KEY, String(enabled));
+    } catch (e) {
+      console.error('Error setting biometric preference', e);
     }
   },
 };

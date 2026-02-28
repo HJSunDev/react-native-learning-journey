@@ -66,6 +66,14 @@ const DEMO_SECTIONS: DemoSection[] = [
     tags: ['expo-notifications', 'Push Token', 'Badge'],
     route: '/notification-lab' as Href,
   },
+  {
+    id: 'biometric',
+    title: '生物认证与安全',
+    description: '指纹/Face ID、App 锁、安全存储架构',
+    icon: 'finger-print',
+    tags: ['expo-local-authentication', 'App Lock', 'SecureStore'],
+    route: '/biometric-lab' as Href,
+  },
 ];
 
 function DemoCard({ section }: { section: DemoSection }) {
