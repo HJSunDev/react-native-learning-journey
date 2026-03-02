@@ -77,8 +77,8 @@
 
 > 最后一公里，把 App 送到用户手中。
 
-- 🔲 **024. 构建与发布流程**
-  - EAS Build 云构建、App 图标/启动屏生成、app.config.ts 多环境配置、App Store + Google Play 提审、expo-updates OTA 热更新、版本管理
+- **[024. 应用构建与分发](notes/024-build-and-distribution.md)**
+  - EAS Update + Expo Go 零成本分发（前半篇）、EAS Build + TestFlight 付费分发方案说明（后半篇）、EAS 套餐配额、分发方案对比
 
 ---
 
