@@ -35,16 +35,16 @@ npm run reset-project
 
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
+## Bootstrap a new project from this codebase
+
+本项目沉淀了一套生产级的 React Native + Expo 基础设施（认证、存储、网络层、表单体系、权限管理等）。如果你想基于这些可复用代码快速启动一个新项目，请参阅：
+
+**[BOOTSTRAP_MANIFEST.md](./BOOTSTRAP_MANIFEST.md)** — 项目引导清单
+
+这份清单供新项目的 AI 助手读取，它会从本项目中按需提取、适配可复用的模块到你的新项目中，同时确保依赖使用最新版本。
+
 ## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [学习文档索引](./docs/README.md) — 本项目的阶段式学习笔记
+- [Expo documentation](https://docs.expo.dev/)
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/)
