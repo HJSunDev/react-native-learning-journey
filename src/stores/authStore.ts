@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import type { User } from '../features/auth/types';
-import { secureStorage, storage } from '../utils/storage';
+import { createStorage, secureStorage } from '../utils/storage';
 
 // 从 features/auth/types.ts 统一导入 User 类型，避免重复定义和循环依赖
 export type { User };
+
+const userStorage = createStorage<User>('user_info');
 
 interface AuthState {
   /** 当前用户信息，null 表示未登录 */
@@ -39,13 +41,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const [token, user] = await Promise.all([
         secureStorage.getToken(),
-        storage.getUserInfo(),
+        userStorage.get(),
       ]);
 
       if (token && user) {
         set({ token, user, isLoading: false });
       } else {
-        // Token 或用户信息缺失，视为未登录
         set({ token: null, user: null, isLoading: false });
       }
     } catch (e) {
@@ -57,7 +58,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: async (token: string, user: User) => {
     await Promise.all([
       secureStorage.setToken(token),
-      storage.setUserInfo(user),
+      userStorage.set(user),
     ]);
     set({ token, user });
   },
@@ -65,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: async () => {
     await Promise.all([
       secureStorage.clearToken(),
-      storage.clearUserInfo(),
+      userStorage.remove(),
     ]);
     set({ token: null, user: null });
   },

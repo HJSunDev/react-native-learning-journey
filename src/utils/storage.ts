@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import type { User } from '../features/auth/types';
 
 // ============================================================
 // 安全存储层 (Secure Storage) —— 基于 expo-secure-store
@@ -47,69 +46,58 @@ export const secureStorage = {
 //   iOS     → 沙盒目录序列化文件 (未加密)
 // 适用范围: 用户偏好设置、缓存数据等非敏感信息
 
-const USER_INFO_KEY = 'user_info';
-const THEME_MODE_KEY = 'theme_mode';
-const BIOMETRIC_ENABLED_KEY = 'biometric_enabled';
+/**
+ * 泛型存储实例接口。
+ *
+ * 通过 createStorage<T>(key) 工厂函数创建，
+ * 各 Store 自行持有实例，storage 模块无需感知业务领域。
+ */
+export interface StorageInstance<T> {
+  get(): Promise<T | null>;
+  set(value: T): Promise<void>;
+  remove(): Promise<void>;
+}
 
-export const storage = {
-  async setUserInfo(info: User): Promise<void> {
-    try {
-      await AsyncStorage.setItem(USER_INFO_KEY, JSON.stringify(info));
-    } catch (e) {
-      console.error('Error setting user info', e);
-    }
-  },
+/**
+ * 创建一个类型安全的 AsyncStorage 存储实例。
+ *
+ * 序列化/反序列化默认使用 JSON，覆盖所有常见类型
+ * （string、number、boolean、object）。
+ *
+ * @param key - AsyncStorage 中的存储键名
+ *
+ * @example
+ * // 在各 Store 中就地创建，存储关注点不外泄
+ * const themeStorage = createStorage<string>('theme_mode');
+ * await themeStorage.set('dark');
+ * const mode = await themeStorage.get(); // 'dark'
+ */
+export function createStorage<T>(key: string): StorageInstance<T> {
+  return {
+    async get(): Promise<T | null> {
+      try {
+        const raw = await AsyncStorage.getItem(key);
+        return raw != null ? (JSON.parse(raw) as T) : null;
+      } catch (e) {
+        console.error(`[Storage] Failed to read key "${key}"`, e);
+        return null;
+      }
+    },
 
-  async getUserInfo(): Promise<User | null> {
-    try {
-      const json = await AsyncStorage.getItem(USER_INFO_KEY);
-      return json ? JSON.parse(json) : null;
-    } catch (e) {
-      console.error('Error getting user info', e);
-      return null;
-    }
-  },
+    async set(value: T): Promise<void> {
+      try {
+        await AsyncStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        console.error(`[Storage] Failed to write key "${key}"`, e);
+      }
+    },
 
-  async clearUserInfo(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(USER_INFO_KEY);
-    } catch (e) {
-      console.error('Error clearing user info', e);
-    }
-  },
-
-  async getThemeMode(): Promise<string | null> {
-    try {
-      return await AsyncStorage.getItem(THEME_MODE_KEY);
-    } catch (e) {
-      console.error('Error getting theme mode', e);
-      return null;
-    }
-  },
-
-  async setThemeMode(mode: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem(THEME_MODE_KEY, mode);
-    } catch (e) {
-      console.error('Error setting theme mode', e);
-    }
-  },
-
-  async getBiometricEnabled(): Promise<boolean> {
-    try {
-      const value = await AsyncStorage.getItem(BIOMETRIC_ENABLED_KEY);
-      return value === 'true';
-    } catch (e) {
-      console.error('Error getting biometric preference', e);
-      return false;
-    }
-  },
-
-  async setBiometricEnabled(enabled: boolean): Promise<void> {
-    try {
-      await AsyncStorage.setItem(BIOMETRIC_ENABLED_KEY, String(enabled));
-    } catch (e) {
-      console.error('Error setting biometric preference', e);
-    }
-  },
-};
+    async remove(): Promise<void> {
+      try {
+        await AsyncStorage.removeItem(key);
+      } catch (e) {
+        console.error(`[Storage] Failed to remove key "${key}"`, e);
+      }
+    },
+  };
+}

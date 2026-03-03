@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { storage } from '../utils/storage';
+import { createStorage } from '../utils/storage';
+
+const biometricStorage = createStorage<boolean>('biometric_enabled');
 
 interface BiometricState {
   /** 用户是否开启了生物认证锁屏 */
@@ -37,11 +39,11 @@ export const useBiometricStore = create<BiometricState>((set, get) => ({
 
   hydrate: async () => {
     try {
-      const enabled = await storage.getBiometricEnabled();
+      const enabled = await biometricStorage.get();
       set({
-        isEnabled: enabled,
+        isEnabled: !!enabled,
         // 开启了生物认证的用户，冷启动时进入锁定态
-        isLocked: enabled,
+        isLocked: !!enabled,
         isLoading: false,
       });
     } catch (e) {
@@ -51,7 +53,7 @@ export const useBiometricStore = create<BiometricState>((set, get) => ({
   },
 
   setEnabled: async (enabled: boolean) => {
-    await storage.setBiometricEnabled(enabled);
+    await biometricStorage.set(enabled);
     set({
       isEnabled: enabled,
       // 关闭时解锁；开启时不锁定（下次切后台再锁）

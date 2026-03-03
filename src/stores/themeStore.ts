@@ -1,9 +1,11 @@
 import { create } from 'zustand';
-import { storage } from '../utils/storage';
+import { createStorage } from '../utils/storage';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 const VALID_MODES: readonly string[] = ['system', 'light', 'dark'];
+
+const themeStorage = createStorage<string>('theme_mode');
 
 interface ThemeState {
   /** 用户选择的主题模式：跟随系统 / 浅色 / 深色 */
@@ -23,7 +25,7 @@ export const useThemeStore = create<ThemeState>((set) => ({
 
   hydrate: async () => {
     try {
-      const saved = await storage.getThemeMode();
+      const saved = await themeStorage.get();
       const mode: ThemeMode =
         saved && VALID_MODES.includes(saved) ? (saved as ThemeMode) : 'system';
       set({ mode, isLoading: false });
@@ -34,6 +36,6 @@ export const useThemeStore = create<ThemeState>((set) => ({
 
   setMode: async (mode: ThemeMode) => {
     set({ mode });
-    await storage.setThemeMode(mode);
+    await themeStorage.set(mode);
   },
 }));
