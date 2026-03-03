@@ -11,6 +11,8 @@ interface ScreenHeaderProps {
   showBack?: boolean;
   /** 右侧自定义内容 */
   headerRight?: ReactNode;
+  /** 无导航历史时的回退路由，由使用方注入，避免组件耦合具体路由结构 */
+  fallbackRoute?: string;
 }
 
 const HEADER_HEIGHT = 56;
@@ -29,6 +31,7 @@ export function ScreenHeader({
   title,
   showBack = true,
   headerRight,
+  fallbackRoute,
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -39,7 +42,9 @@ export function ScreenHeader({
       router.back();
       return;
     }
-    router.replace('/(tabs)/explore');
+    if (fallbackRoute) {
+      router.replace(fallbackRoute as never);
+    }
   };
 
   return (

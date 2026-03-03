@@ -20,6 +20,7 @@ export default function ScreensLayout() {
                 ? options.headerTitle
                 : options.title ?? route.name
             }
+            fallbackRoute="/(tabs)/explore"
           />
         ),
       }}
